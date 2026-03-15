@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Dékal">
 <link rel="manifest" id="pwa-manifest">
-<title>Dékal Multijoueur v1.2.6</title>
+<title>Dékal Multijoueur v1.2.7</title>
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/davidshimjs-qrcodejs@0.0.2/qrcode.min.js"></script>
 <style>
@@ -68,15 +68,15 @@ input::placeholder{color:#888}
 /* push arrows around grid */
 .push-btn{
   border-radius:6px;
-  background:rgba(46,204,113,.18);
-  border:1.5px solid rgba(46,204,113,.4);
-  color:#2ecc71;font-size:1.15em;font-weight:700;
+  background:rgba(231,76,60,.2);
+  border:1.5px solid rgba(231,76,60,.5);
+  color:#e74c3c;font-size:1.15em;font-weight:700;
   cursor:pointer;
   display:flex;align-items:center;justify-content:center;
   min-height:auto;padding:0;line-height:1;
   transition:all .15s;flex-shrink:0;
 }
-.push-btn:hover{background:rgba(46,204,113,.38);border-color:#2ecc71;transform:scale(1.1);box-shadow:0 0 10px rgba(46,204,113,.4)}
+.push-btn:hover{background:rgba(231,76,60,.45);border-color:#e74c3c;transform:scale(1.1);box-shadow:0 0 10px rgba(231,76,60,.5)}
 .push-btn:active{transform:scale(.93)}
 .push-btn:disabled{opacity:.2;cursor:not-allowed}
 
@@ -265,7 +265,7 @@ input::placeholder{color:#888}
   const blob=new Blob([JSON.stringify(m)],{type:'application/manifest+json'});
   document.getElementById('pwa-manifest').href=URL.createObjectURL(blob);
 })();
-if('serviceWorker' in navigator){const sw=`const C='dekal-v1.2.6';self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',()=>clients.claim());`;navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});}
+if('serviceWorker' in navigator){const sw=`const C='dekal-v1.2.7';self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',()=>clients.claim());`;navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});}
 </script>
 </head>
 <body>
@@ -274,7 +274,7 @@ if('serviceWorker' in navigator){const sw=`const C='dekal-v1.2.6';self.addEventL
 <div id="splash-screen">
   <div class="splash-title">DÉKAL</div>
   <div class="splash-cards" id="splash-cards"></div>
-  <div class="splash-sub">v1.2.6</div>
+  <div class="splash-sub">v1.2.7</div>
   <div class="splash-tagline">crédits : claude.ai · @Pneubis</div>
   <div class="splash-progress"><div class="splash-progress-bar"></div></div>
   <script>
@@ -315,7 +315,7 @@ if('serviceWorker' in navigator){const sw=`const C='dekal-v1.2.6';self.addEventL
 <!-- SCREEN: MENU -->
 <div class="screen active" id="screen-menu">
   <h1>DÉKAL</h1>
-  <p style="font-size:.85em;color:rgba(255,255,255,.65);letter-spacing:3px;margin:-4px 0 10px;font-weight:600">v1.2.6</p>
+  <p style="font-size:.85em;color:rgba(255,255,255,.65);letter-spacing:3px;margin:-4px 0 10px;font-weight:600">v1.2.7</p>
   <p class="subtitle" style="margin-top:0">
     <button onclick="UI.showRules()" style="background:none;border:1px solid rgba(255,255,255,.25);color:#aaa;font-size:.8em;font-weight:600;padding:3px 12px;border-radius:20px;cursor:pointer;min-height:auto">ⓘ Règles</button>
     <button onclick="UI.showScoreOptions()" id="score-target-btn" style="background:none;border:1px solid rgba(245,166,35,.4);color:rgba(245,166,35,.8);font-size:.8em;font-weight:600;padding:3px 12px;border-radius:20px;cursor:pointer;min-height:auto;margin-left:8px">🎯 Score max : 50</button>
@@ -435,7 +435,7 @@ if('serviceWorker' in navigator){const sw=`const C='dekal-v1.2.6';self.addEventL
 <script>
 "use strict";
 // ============================================================
-// DÉKAL MULTIJOUEUR v1.2.6
+// DÉKAL MULTIJOUEUR v1.2.7
 //
 // RÈGLES EXACTES :
 // - 100 cartes Dékal numérotées
