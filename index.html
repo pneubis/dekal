@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Dékal">
 <link rel="manifest" id="pwa-manifest">
-<title>Dékal Multijoueur v1.0.5</title>
+<title>Dékal Multijoueur v1.1.5</title>
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/davidshimjs-qrcodejs@0.0.2/qrcode.min.js"></script>
 <style>
@@ -46,8 +46,10 @@ input::placeholder{color:#888}
   background:linear-gradient(135deg,#c0392b,#922b21);
   color:transparent;cursor:pointer;
   border-color:rgba(200,60,40,.5);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 52'%3E%3Crect width='52' height='52' rx='7' fill='%23a93226'/%3E%3Crect x='3' y='3' width='46' height='46' rx='5' fill='none' stroke='rgba(255,255,255,0.2)' stroke-width='1'/%3E%3Ctext x='26' y='22' text-anchor='middle' font-family='Arial Black,Arial,sans-serif' font-weight='900' font-size='8' fill='rgba(255,255,255,0.85)' letter-spacing='1'%3ED%C3%89KAL%3C/text%3E%3Cline x1='10' y1='27' x2='42' y2='27' stroke='rgba(255,255,255,0.25)' stroke-width='0.8'/%3E%3Ctext x='26' y='38' text-anchor='middle' font-family='Arial,sans-serif' font-size='13' fill='rgba(255,255,255,0.3)'%3E%E2%97%86%3C/text%3E%3C/svg%3E");
+  background-size:cover;
 }
-.card.face-down::after{content:'🂠';color:rgba(255,255,255,.15);font-size:1.4em;position:absolute}
+.card.face-down::after{content:none}
 .card.selectable{animation:cardPulse 1s infinite;cursor:pointer}
 @keyframes cardPulse{0%,100%{box-shadow:0 0 0 2px rgba(245,166,35,.4)}50%{box-shadow:0 0 0 4px rgba(245,166,35,.9),0 0 14px rgba(245,166,35,.4)}}
 .card.selected{box-shadow:0 0 0 3px #f5a623,0 0 16px rgba(245,166,35,.6);transform:translateY(-4px);background:#3a3a0a;border-color:#f5a623}
@@ -60,8 +62,7 @@ input::placeholder{color:#888}
 .cv-low {background:linear-gradient(135deg,#1a6b3a,#27ae60);border-color:rgba(46,204,113,.4)}  /* 1-3 */
 .cv-mid {background:linear-gradient(135deg,#1a4a8a,#2980b9);border-color:rgba(52,152,219,.4)}  /* 4-6 */
 .cv-high{background:linear-gradient(135deg,#7d3c98,#9b59b6);border-color:rgba(155,89,182,.4)}  /* 7-9 */
-.cv-top {background:linear-gradient(135deg,#922b21,#e74c3c);border-color:rgba(231,76,60,.4)}   /* 10+ */
-.cv-zero{background:linear-gradient(135deg,#1a1a2e,#2c2c4e);border-color:rgba(255,255,255,.1)} /* 0 */
+.cv-top {background:linear-gradient(135deg,#922b21,#e74c3c);border-color:rgba(231,76,60,.4)}   /* 10 */
 
 /* ── GRID ── */
 .grid-wrap{display:inline-flex;flex-direction:column;gap:4px;padding:6px;border-radius:10px;background:rgba(255,255,255,.04)}
@@ -257,7 +258,7 @@ input::placeholder{color:#888}
   const blob=new Blob([JSON.stringify(m)],{type:'application/manifest+json'});
   document.getElementById('pwa-manifest').href=URL.createObjectURL(blob);
 })();
-if('serviceWorker' in navigator){const sw=`const C='dekal-v1.0.5';self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',()=>clients.claim());`;navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});}
+if('serviceWorker' in navigator){const sw=`const C='dekal-v1.1.5';self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',()=>clients.claim());`;navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});}
 </script>
 </head>
 <body>
@@ -265,7 +266,7 @@ if('serviceWorker' in navigator){const sw=`const C='dekal-v1.0.5';self.addEventL
 <!-- SPLASH -->
 <div id="splash-screen">
   <div class="splash-title">DÉKAL</div>
-  <div class="splash-sub">v1.0.5</div>
+  <div class="splash-sub">v1.1.5</div>
   <div class="splash-tagline">crédits : claude.ai · @Pneubis</div>
   <div class="splash-progress"><div class="splash-progress-bar"></div></div>
 </div>
@@ -291,7 +292,7 @@ if('serviceWorker' in navigator){const sw=`const C='dekal-v1.0.5';self.addEventL
 <!-- SCREEN: MENU -->
 <div class="screen active" id="screen-menu">
   <h1>DÉKAL</h1>
-  <p style="font-size:.85em;color:rgba(255,255,255,.65);letter-spacing:3px;margin:-4px 0 10px;font-weight:600">v1.0.5</p>
+  <p style="font-size:.85em;color:rgba(255,255,255,.65);letter-spacing:3px;margin:-4px 0 10px;font-weight:600">v1.1.5</p>
   <p class="subtitle" style="margin-top:0">
     <button onclick="UI.showRules()" style="background:none;border:1px solid rgba(255,255,255,.25);color:#aaa;font-size:.8em;font-weight:600;padding:3px 12px;border-radius:20px;cursor:pointer;min-height:auto">ⓘ Règles</button>
   </p>
@@ -398,6 +399,7 @@ if('serviceWorker' in navigator){const sw=`const C='dekal-v1.0.5';self.addEventL
     <h2 style="margin-bottom:2px;align-self:flex-start">🏁 Fin de partie</h2>
     <p class="subtitle" style="margin-bottom:8px;align-self:flex-start" id="round-scores-subtitle"></p>
     <table class="scores-table" id="round-scores-table"></table>
+    <div class="leaderboard-box" id="end-leaderboard" style="margin-top:12px"></div>
     <div class="btn-group" style="margin-top:16px;width:100%;justify-content:center">
       <button id="next-round-btn" onclick="App.nextRound()">Rejouer →</button>
       <button class="danger" onclick="App.backToMenu(true)" style="min-height:48px;padding:12px 20px;font-size:.9em">🏠 Menu</button>
@@ -408,7 +410,7 @@ if('serviceWorker' in navigator){const sw=`const C='dekal-v1.0.5';self.addEventL
 <script>
 "use strict";
 // ============================================================
-// DÉKAL MULTIJOUEUR v1.0.5
+// DÉKAL MULTIJOUEUR v1.1.5
 //
 // RÈGLES EXACTES :
 // - 100 cartes Dékal numérotées
@@ -436,8 +438,8 @@ const HOST_MIGRATION_DELAY_MS = 1500;
 // 100 cartes Dékal : on génère des valeurs 1-15 (distribution approximative)
 function createDekDeck() {
   const deck = [];
-  // Cartes 1 à 15, distribution pondérée (plus de petites valeurs)
-  const dist = {1:10,2:10,3:10,4:8,5:8,6:8,7:8,8:8,9:8,10:6,11:6,12:6,13:4,14:4,15:4};
+  // 100 cartes, valeurs 1-10
+  const dist = {1:10,2:10,3:10,4:10,5:10,6:10,7:10,8:10,9:10,10:10};
   for (const [v, n] of Object.entries(dist)) {
     for (let i = 0; i < n; i++) deck.push(parseInt(v));
   }
@@ -742,7 +744,68 @@ const Network = (() => {
 })();
 
 // ── GAME LOGIC ──
+// MÉCANIQUE DÉKAL :
+// - Chaque joueur choisit 1 carte face cachée → elle se retourne et sort de la grille (slot null)
+// - Révélation simultanée, cartes au centre
+// - Porteur du pion choisit une carte du centre, l'insère dans SA grille via le slot vide :
+//     seule la ligne/col contenant le slot null peut être poussée,
+//     seulement depuis le côté OPPOSÉ au slot (3 cartes poussent vers le slot null)
+//     Le slot null "sort", grille redevient 4×4. Aucune carte perdue.
+// - Autres joueurs font de même dans l'ordre. Pion passe.
+
 function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+// Retourne les mouvements valides pour une grille avec 1 slot null
+// Valide = slot à une EXTRÉMITÉ de sa ligne/col, push depuis le côté OPPOSÉ
+function getValidPushMoves(grid) {
+  // Un push est valide si la ligne/col contient exactement 1 slot null
+  // On peut pousser depuis CHACUN des deux côtés (gauche OU droite pour une ligne, haut OU bas pour une col)
+  // car les cartes glissent vers le slot null depuis le côté opposé à l'entrée
+  const moves = [];
+  for (let i = 0; i < GRID; i++) {
+    const nullsInRow = [0,1,2,3].filter(c => grid[i][c] === null);
+    if (nullsInRow.length === 1) {
+      // On peut insérer depuis la gauche (row_right) ou depuis la droite (row_left)
+      // SAUF depuis le côté où se trouve le slot lui-même (impossible d'entrer là)
+      const nullC = nullsInRow[0];
+      if (nullC !== 0)       moves.push({ dir: 'row_right', idx: i }); // insère à gauche (col 0)
+      if (nullC !== GRID-1)  moves.push({ dir: 'row_left',  idx: i }); // insère à droite (col 3)
+    }
+    const nullsInCol = [0,1,2,3].filter(r => grid[r][i] === null);
+    if (nullsInCol.length === 1) {
+      const nullR = nullsInCol[0];
+      if (nullR !== 0)       moves.push({ dir: 'col_up',   idx: i }); // insère en haut (row 0)
+      if (nullR !== GRID-1)  moves.push({ dir: 'col_down', idx: i }); // insère en bas (row 3)
+    }
+  }
+  return moves;
+}
+
+// Applique le push : les cartes entre le bord d'entrée et le slot null glissent d'une case vers le slot
+// La nouvelle carte entre par le bord, le slot disparaît absorbé par le mouvement
+function applyPush(grid, dir, idx, v) {
+  if (dir === 'row_right') {
+    // Insère en col 0, les cartes à gauche du slot glissent vers la droite jusqu'au slot
+    const nullC = [0,1,2,3].findIndex(c => grid[idx][c] === null);
+    for (let c = nullC; c > 0; c--) grid[idx][c] = grid[idx][c-1];
+    grid[idx][0] = { v, revealed: true };
+  } else if (dir === 'row_left') {
+    // Insère en col GRID-1, les cartes à droite du slot glissent vers la gauche jusqu'au slot
+    const nullC = [0,1,2,3].findIndex(c => grid[idx][c] === null);
+    for (let c = nullC; c < GRID-1; c++) grid[idx][c] = grid[idx][c+1];
+    grid[idx][GRID-1] = { v, revealed: true };
+  } else if (dir === 'col_up') {
+    // Insère en row 0, les cartes au-dessus du slot glissent vers le bas jusqu'au slot
+    const nullR = [0,1,2,3].findIndex(r => grid[r][idx] === null);
+    for (let r = nullR; r > 0; r--) grid[r][idx] = grid[r-1][idx];
+    grid[0][idx] = { v, revealed: true };
+  } else if (dir === 'col_down') {
+    // Insère en row GRID-1, les cartes en-dessous du slot glissent vers le haut jusqu'au slot
+    const nullR = [0,1,2,3].findIndex(r => grid[r][idx] === null);
+    for (let r = nullR; r < GRID-1; r++) grid[r][idx] = grid[r+1][idx];
+    grid[GRID-1][idx] = { v, revealed: true };
+  }
+}
 
 function initRound() {
   const deck = createDekDeck();
@@ -755,20 +818,21 @@ function initRound() {
       g.push(row);
     }
     grids[p.id] = g;
-    chosen[p.id] = null; // carte choisie ce tour
+    chosen[p.id] = null;
   });
   gameState.phase = 'playing';
-  gameState.turn = 0;           // 0..15
-  gameState.subPhase = 'choose'; // 'choose' | 'dekal_picks' | 'others_push' | 'push_mine'
-  gameState.dekalIdx = 0;       // index du joueur avec le pion
-  gameState.centerCards = [];   // [{playerId, row, col, v}]
-  gameState.pushQueue = [];     // ordre des joueurs qui doivent pousser
+  gameState.turn = 0;
+  gameState.subPhase = 'choose';
+  gameState.dekalIdx = 0;
+  gameState.centerCards = [];
+  gameState.pushQueue = [];
   gameState.pushQueueIdx = 0;
   gameState.grids = grids;
   gameState.chosen = chosen;
   gameState.chosenCount = 0;
+  gameState.pendingCard = null;
   ActionLog.clear();
-  Network.broadcastToast('Manche — Choisissez une carte !');
+  Network.broadcastToast('Tour 1/16 — Choisissez une carte !');
   Network.broadcastState();
   setTimeout(() => Bot.maybePlay(), 200);
 }
@@ -780,41 +844,29 @@ function performAction(action) {
 
 function handlePlayerAction(playerId, action) {
   if (!isHost || !gameState || gameState.phase !== 'playing') return;
-
   switch (action.type) {
 
     case 'choose_card': {
-      // Phase 'choose' : chaque joueur choisit 1 carte face cachée
       if (gameState.subPhase !== 'choose') return;
-      if (gameState.chosen[playerId]) return; // déjà choisi
+      if (gameState.chosen[playerId]) return;
       const { row, col } = action;
       const cell = gameState.grids[playerId][row][col];
-      if (!cell || cell.revealed) return; // doit être face cachée
+      if (!cell || cell.revealed) return;
+      // La carte sort de la grille (slot null) et sera visible au centre
+      gameState.grids[playerId][row][col] = null;
       gameState.chosen[playerId] = { row, col, v: cell.v };
       gameState.chosenCount = (gameState.chosenCount || 0) + 1;
-      Network.broadcastLog('🤫 ' + getPlayerName(playerId) + ' choisit une carte (ligne ' + (row+1) + ', col ' + (col+1) + ')');
-      // Vérifier si tout le monde a choisi
       const allChosen = gameState.players.every(p => !!gameState.chosen[p.id]);
       if (allChosen) {
-        // Révélation simultanée → construire centerCards
         gameState.centerCards = gameState.players.map(p => ({
-          playerId: p.id,
-          row: gameState.chosen[p.id].row,
-          col: gameState.chosen[p.id].col,
-          v: gameState.chosen[p.id].v
+          playerId: p.id, row: gameState.chosen[p.id].row, col: gameState.chosen[p.id].col, v: gameState.chosen[p.id].v
         }));
-        // Retirer les cartes des grilles (elles sont au centre)
-        gameState.players.forEach(p => {
-          const ch = gameState.chosen[p.id];
-          gameState.grids[p.id][ch.row][ch.col] = null; // slot vide
-        });
         gameState.subPhase = 'dekal_picks';
-        Network.broadcastToast('🏅 ' + getPlayerName(gameState.players[gameState.dekalIdx].id) + ' choisit une carte !');
-        // Log détaillé : chaque joueur + sa carte révélée
-        const revealLines = gameState.centerCards.map(c =>
-          getPlayerName(c.playerId) + ' → ' + c.v
-        ).join(' · ');
+        const revealLines = gameState.centerCards.map(c => getPlayerName(c.playerId) + ' → ' + c.v).join(' · ');
         Network.broadcastLog('👀 Révélation : ' + revealLines);
+        Network.broadcastToast('🏅 ' + getPlayerName(gameState.players[gameState.dekalIdx].id) + ' choisit !');
+      } else {
+        Network.broadcastLog('🤫 ' + getPlayerName(playerId) + ' choisit (L'+(row+1)+' C'+(col+1)+')');
       }
       Network.broadcastState();
       setTimeout(() => Bot.maybePlay(), 100);
@@ -822,68 +874,35 @@ function handlePlayerAction(playerId, action) {
     }
 
     case 'pick_center': {
-      // Le joueur Dékal (et ensuite les autres dans l'ordre) choisit une carte du centre
       if (gameState.subPhase !== 'dekal_picks' && gameState.subPhase !== 'others_push') return;
-      const dekalPlayerId = gameState.players[gameState.dekalIdx].id;
-      if (gameState.subPhase === 'dekal_picks' && playerId !== dekalPlayerId) return;
-      if (gameState.subPhase === 'others_push') {
-        // Vérifier que c'est bien ce joueur's turn in push queue
-        const expectedId = gameState.pushQueue[gameState.pushQueueIdx];
-        if (playerId !== expectedId) return;
-      }
+      const dekalId = gameState.players[gameState.dekalIdx].id;
+      if (gameState.subPhase === 'dekal_picks' && playerId !== dekalId) return;
+      if (gameState.subPhase === 'others_push' && playerId !== gameState.pushQueue[gameState.pushQueueIdx]) return;
       const { centerIdx } = action;
       if (centerIdx < 0 || centerIdx >= gameState.centerCards.length) return;
-      const pickedCard = gameState.centerCards[centerIdx];
+      const picked = gameState.centerCards[centerIdx];
       gameState.centerCards.splice(centerIdx, 1);
-      gameState.pendingCard = { playerId, v: pickedCard.v }; // carte à insérer
+      gameState.pendingCard = { playerId, v: picked.v, fromPlayer: picked.playerId };
       gameState.subPhase = 'push_mine';
-      Network.broadcastLog('✋ ' + getPlayerName(playerId) + ' prend le ' + pickedCard.v + ' (de ' + getPlayerName(pickedCard.playerId) + ')');
+      Network.broadcastLog('✋ ' + getPlayerName(playerId) + ' prend ' + picked.v + ' (de ' + getPlayerName(picked.playerId) + ')');
       Network.broadcastState();
       setTimeout(() => Bot.maybePlay(), 100);
       break;
     }
 
     case 'push_card': {
-      // Insérer la carte en poussant une ligne/colonne
       if (gameState.subPhase !== 'push_mine') return;
       if (!gameState.pendingCard || gameState.pendingCard.playerId !== playerId) return;
-      const { dir, idx } = action; // dir: 'row_left'|'row_right'|'col_up'|'col_down', idx: 0-3
+      const { dir, idx } = action;
       const grid = gameState.grids[playerId];
       const v = gameState.pendingCard.v;
-      let ejected = null;
-
-      if (dir === 'row_right') {
-        // Insérer à gauche, pousse vers la droite, éjecte à droite
-        ejected = grid[idx][GRID - 1];
-        for (let c = GRID - 1; c > 0; c--) grid[idx][c] = grid[idx][c - 1];
-        grid[idx][0] = { v, revealed: true };
-      } else if (dir === 'row_left') {
-        ejected = grid[idx][0];
-        for (let c = 0; c < GRID - 1; c++) grid[idx][c] = grid[idx][c + 1];
-        grid[idx][GRID - 1] = { v, revealed: true };
-      } else if (dir === 'col_down') {
-        ejected = grid[GRID - 1][idx];
-        for (let r = GRID - 1; r > 0; r--) grid[r][idx] = grid[r - 1][idx];
-        grid[0][idx] = { v, revealed: true };
-      } else if (dir === 'col_up') {
-        ejected = grid[0][idx];
-        for (let r = 0; r < GRID - 1; r++) grid[r][idx] = grid[r + 1][idx];
-        grid[GRID - 1][idx] = { v, revealed: true };
-      }
-
-      // Nettoyer tous les null résiduels dans toute la grille
-      // (le slot vide du joueur peut rester si la ligne/col poussée est différente de celle d'où vient la carte)
-      for (let r = 0; r < GRID; r++)
-        for (let c = 0; c < GRID; c++)
-          if (grid[r][c] === null) grid[r][c] = { v: 0, revealed: false };
-
+      const validMoves = getValidPushMoves(grid);
+      if (!validMoves.some(m => m.dir === dir && m.idx === idx)) return;
+      applyPush(grid, dir, idx, v);
       gameState.pendingCard = null;
-      const dirLabel = { row_right:'→ ligne '+(idx+1), row_left:'← ligne '+(idx+1), col_down:'↓ col '+(idx+1), col_up:'↑ col '+(idx+1) }[dir] || dir;
-      const ejectLabel = ejected ? ' · éjecte ' + (ejected.v !== undefined ? ejected.v : '?') : '';
-      Network.broadcastLog('➡️ ' + getPlayerName(playerId) + ' insère ' + v + ' (' + dirLabel + ejectLabel + ')');
+      const dirLabel = {row_right:'→ L'+(idx+1), row_left:'← L'+(idx+1), col_down:'↓ C'+(idx+1), col_up:'↑ C'+(idx+1)}[dir];
+      Network.broadcastLog('➡️ ' + getPlayerName(playerId) + ' insère ' + v + ' (' + dirLabel + ')');
       Sound.play('push');
-
-      // Advance to next player in queue or end turn
       advancePushQueue();
       break;
     }
@@ -891,34 +910,21 @@ function handlePlayerAction(playerId, action) {
 }
 
 function advancePushQueue() {
-  if (gameState.subPhase === 'push_mine') {
-    // Just finished a push — determine next step
-    if (gameState.centerCards.length === 0) {
-      // All cards picked — end of turn
-      endTurn();
-    } else {
-      // Still cards in center — build/advance push queue
-      if (!gameState.pushQueue || gameState.pushQueueIdx === undefined) {
-        // Build queue: all players except dekalIdx, in rotation order
-        const dekalI = gameState.dekalIdx;
-        const queue = [];
-        for (let i = 1; i < gameState.players.length; i++) {
-          queue.push(gameState.players[(dekalI + i) % gameState.players.length].id);
-        }
-        gameState.pushQueue = queue;
-        gameState.pushQueueIdx = 0;
-      } else {
-        gameState.pushQueueIdx++;
-      }
-      if (gameState.pushQueueIdx >= gameState.pushQueue.length) {
-        endTurn();
-        return;
-      }
-      gameState.subPhase = 'others_push';
-    }
-    Network.broadcastState();
-    setTimeout(() => Bot.maybePlay(), 100);
+  if (gameState.centerCards.length === 0) { endTurn(); return; }
+  if (!gameState.pushQueue.length) {
+    const dekalI = gameState.dekalIdx;
+    const queue = [];
+    for (let i = 1; i < gameState.players.length; i++)
+      queue.push(gameState.players[(dekalI+i) % gameState.players.length].id);
+    gameState.pushQueue = queue;
+    gameState.pushQueueIdx = 0;
+  } else {
+    gameState.pushQueueIdx++;
   }
+  if (gameState.pushQueueIdx >= gameState.pushQueue.length) { endTurn(); return; }
+  gameState.subPhase = 'others_push';
+  Network.broadcastState();
+  setTimeout(() => Bot.maybePlay(), 100);
 }
 
 function endTurn() {
@@ -930,83 +936,84 @@ function endTurn() {
   gameState.pushQueueIdx = 0;
   gameState.pendingCard = null;
   gameState.chosenCount = 0;
-  // Pion passe au joueur suivant
-  gameState.dekalIdx = (gameState.dekalIdx + 1) % gameState.players.length;
-
-  if (gameState.turn >= TOTAL_TURNS) {
-    endGame();
-    return;
-  }
-
-  Network.broadcastToast('Tour ' + (gameState.turn + 1) + '/16 — ' + getPlayerName(gameState.players[gameState.dekalIdx].id) + ' a le pion !');
+  gameState.dekalIdx = (gameState.dekalIdx+1) % gameState.players.length;
+  if (gameState.turn >= TOTAL_TURNS) { endGame(); return; }
+  Network.broadcastToast('Tour '+(gameState.turn+1)+'/16 — 🏅 '+getPlayerName(gameState.players[gameState.dekalIdx].id));
   Network.broadcastState();
   setTimeout(() => Bot.maybePlay(), 200);
 }
 
 function endGame() {
-  // Révéler toutes les cartes
   gameState.players.forEach(p => {
     const g = gameState.grids[p.id];
-    for (let r = 0; r < GRID; r++)
-      for (let c = 0; c < GRID; c++)
-        if (g[r][c]) g[r][c].revealed = true;
+    for (let r=0;r<GRID;r++) for(let c=0;c<GRID;c++) if(g[r][c]) g[r][c].revealed=true;
   });
-
-  // Annuler les cartes adjacentes de même valeur
   gameState.players.forEach(p => {
     const g = gameState.grids[p.id];
-    let totalAnnulled = 0;
-    let changed = true;
-    while (changed) {
-      changed = false;
-      const toAnnul = new Set();
-      for (let r = 0; r < GRID; r++) {
-        for (let c = 0; c < GRID; c++) {
-          if (!g[r][c]) continue;
-          const v = g[r][c].v;
-          // Vérifier droite
-          if (c + 1 < GRID && g[r][c+1] && g[r][c+1].v === v) { toAnnul.add(`${r},${c}`); toAnnul.add(`${r},${c+1}`); }
-          // Vérifier bas
-          if (r + 1 < GRID && g[r+1][c] && g[r+1][c].v === v) { toAnnul.add(`${r},${c}`); toAnnul.add(`${r+1},${c}`); }
-        }
-      }
-      if (toAnnul.size) {
-        changed = true;
-        totalAnnulled += toAnnul.size;
-        toAnnul.forEach(k => { const [r,c] = k.split(',').map(Number); g[r][c] = { v: 0, revealed: true, annulled: true }; });
-        // Remove annulled
-        for (let r = 0; r < GRID; r++)
-          for (let c = 0; c < GRID; c++)
-            if (g[r][c] && g[r][c].annulled) g[r][c] = null;
-      }
-    }
-    if (totalAnnulled > 0) {
-      ActionLog.add('✨ ' + p.name + ' : ' + totalAnnulled + ' carte' + (totalAnnulled > 1 ? 's' : '') + ' annulée' + (totalAnnulled > 1 ? 's' : ''));
-    }
+    // Compter les cartes avant annulation
+    const before = g.flat().filter(c=>c).length;
+    annulGroups(g);
+    const after = g.flat().filter(c=>c).length;
+    const totalAnnulled = before - after;
+    if(totalAnnulled>0) ActionLog.add('✨ '+p.name+' : '+totalAnnulled+' carte'+(totalAnnulled>1?'s':'')+' annulée'+(totalAnnulled>1?'s':''));
   });
-
-  // Calculer les scores
-  const scores = {};
-  gameState.players.forEach(p => {
-    let s = 0;
-    for (let r = 0; r < GRID; r++)
-      for (let c = 0; c < GRID; c++)
-        if (gameState.grids[p.id][r][c]) s += gameState.grids[p.id][r][c].v;
-    scores[p.id] = s;
-    gameState.totalScores[p.id] = (gameState.totalScores[p.id] || 0) + s;
+  const scores={};
+  gameState.players.forEach(p=>{
+    let s=0;
+    for(let r=0;r<GRID;r++) for(let c=0;c<GRID;c++) if(gameState.grids[p.id][r][c]) s+=gameState.grids[p.id][r][c].v;
+    scores[p.id]=s; gameState.totalScores[p.id]=(gameState.totalScores[p.id]||0)+s;
   });
-  gameState.roundScores = scores;
-  gameState.phase = 'game_over';
-
-  const sorted = [...gameState.players].sort((a, b) => (scores[a.id] || 0) - (scores[b.id] || 0));
-  gameState.players.forEach(p => Leaderboard.update(p.name, p.id === sorted[0].id));
-  try { localStorage.removeItem('dekal_activeRoom'); } catch(e) {}
-
-  Sound.play('win');
-  Network.broadcastState();
+  gameState.roundScores=scores; gameState.phase='game_over';
+  const sorted=[...gameState.players].sort((a,b)=>(scores[a.id]||0)-(scores[b.id]||0));
+  gameState.players.forEach(p=>Leaderboard.update(p.name,p.id===sorted[0].id));
+  try{localStorage.removeItem('dekal_activeRoom');}catch(e){}
+  Sound.play('win'); Network.broadcastState();
 }
 
-function getPlayerName(pid) { return (gameState?.players || []).find(p => p.id === pid)?.name || '?'; }
+function getPlayerName(pid){return(gameState?.players||[]).find(p=>p.id===pid)?.name||'?';}
+
+// Flood-fill : trouve tous les groupes connexes de même valeur (≥2 cartes) et les annule
+// Modifie la grille en place (null = annulée)
+function annulGroups(g) {
+  const visited = Array.from({length:GRID}, () => Array(GRID).fill(false));
+  for (let r = 0; r < GRID; r++) {
+    for (let c = 0; c < GRID; c++) {
+      if (!g[r][c] || visited[r][c]) continue;
+      const v = g[r][c].v;
+      // BFS pour trouver tout le groupe connexe de valeur v
+      const group = [];
+      const queue = [[r, c]];
+      visited[r][c] = true;
+      while (queue.length) {
+        const [cr, cc] = queue.shift();
+        group.push([cr, cc]);
+        for (const [nr, nc] of [[cr-1,cc],[cr+1,cc],[cr,cc-1],[cr,cc+1]]) {
+          if (nr>=0 && nr<GRID && nc>=0 && nc<GRID && !visited[nr][nc] && g[nr][nc] && g[nr][nc].v===v) {
+            visited[nr][nc] = true;
+            queue.push([nr, nc]);
+          }
+        }
+      }
+      // Si le groupe a ≥2 cartes → toutes s'annulent
+      if (group.length >= 2) {
+        group.forEach(([gr, gc]) => { g[gr][gc] = null; });
+      }
+    }
+  }
+}
+
+// Calcule le score visible en simulant les annulations sur les cartes révélées
+// Algorithme flood-fill : un groupe CONNEXE de ≥2 cartes de même valeur s'annule entièrement
+function calcVisibleScore(pid) {
+  const grid = gameState?.grids?.[pid];
+  if (!grid) return 0;
+  // Copie : seules les cartes révélées comptent
+  const g = grid.map(row => row.map(cell =>
+    (cell && cell.revealed) ? { v: cell.v } : null
+  ));
+  annulGroups(g);
+  return g.flat().reduce((s, c) => s + (c ? c.v : 0), 0);
+}
 
 // ── BOT AI ──
 const Bot = (() => {
@@ -1015,105 +1022,136 @@ const Bot = (() => {
   const delay = ms => new Promise(r => setTimeout(r, ms));
 
   async function maybePlay() {
-    if (!isHost || !gameState || gameState.phase !== 'playing') return;
+    if (!isHost||!gameState||gameState.phase!=='playing') return;
     const sub = gameState.subPhase;
-
-    // Phase choose : bots choisissent une carte
-    if (sub === 'choose') {
+    if (sub==='choose') {
       for (const p of gameState.players) {
-        if (!p.isBot || gameState.chosen[p.id]) continue;
-        await delay(400 + Math.random() * 400);
-        if (!gameState || gameState.subPhase !== 'choose') return;
-        botChooseCard(p.id);
+        if (!p.isBot||gameState.chosen[p.id]) continue;
+        await delay(400+Math.random()*400);
+        if (!gameState||gameState.subPhase!=='choose') return;
+        botChoose(p.id);
       }
       return;
     }
-
-    // Phase dekal_picks ou others_push : bot qui doit choisir au centre
-    if (sub === 'dekal_picks') {
-      const dp = gameState.players[gameState.dekalIdx];
-      if (!dp.isBot) return;
-      await delay(600);
-      if (!gameState || gameState.subPhase !== 'dekal_picks') return;
-      botPickCenter(dp.id);
-      return;
+    if (sub==='dekal_picks') {
+      const dp=gameState.players[gameState.dekalIdx]; if(!dp.isBot) return;
+      await delay(600); if(!gameState||gameState.subPhase!=='dekal_picks') return;
+      botPickCenter(dp.id); return;
     }
-    if (sub === 'others_push') {
-      const eid = gameState.pushQueue?.[gameState.pushQueueIdx];
-      const ep = gameState.players.find(p => p.id === eid);
-      if (!ep || !ep.isBot) return;
-      await delay(500);
-      if (!gameState || gameState.subPhase !== 'others_push') return;
-      botPickCenter(ep.id);
-      return;
+    if (sub==='others_push') {
+      const eid=gameState.pushQueue?.[gameState.pushQueueIdx];
+      const ep=gameState.players.find(p=>p.id===eid); if(!ep||!ep.isBot) return;
+      await delay(500); if(!gameState||gameState.subPhase!=='others_push') return;
+      botPickCenter(ep.id); return;
     }
-
-    // Phase push_mine : bot pousse
-    if (sub === 'push_mine' && gameState.pendingCard) {
-      const pp = gameState.players.find(p => p.id === gameState.pendingCard.playerId);
-      if (!pp || !pp.isBot) return;
-      await delay(500);
-      if (!gameState || gameState.subPhase !== 'push_mine') return;
+    if (sub==='push_mine'&&gameState.pendingCard) {
+      const pp=gameState.players.find(p=>p.id===gameState.pendingCard.playerId);
+      if(!pp||!pp.isBot) return;
+      await delay(600); if(!gameState||gameState.subPhase!=='push_mine') return;
       botPush(pp.id);
     }
   }
 
-  function botChooseCard(botId) {
+  // Compte combien de cartes de valeur v sont adjacentes à la case (r,c) dans la grille
+  function countAdjacent(grid, r, c, v) {
+    let n = 0;
+    if (r>0      && grid[r-1][c] && grid[r-1][c].v===v) n++;
+    if (r<GRID-1 && grid[r+1][c] && grid[r+1][c].v===v) n++;
+    if (c>0      && grid[r][c-1] && grid[r][c-1].v===v) n++;
+    if (c<GRID-1 && grid[r][c+1] && grid[r][c+1].v===v) n++;
+    return n;
+  }
+
+  // Score d'une grille : somme des valeurs, avec bonus si cartes identiques adjacentes
+  function scoreGrid(grid, adjacencyBonus) {
+    let sum = 0;
+    for (let r=0;r<GRID;r++) for(let c=0;c<GRID;c++) {
+      if (!grid[r][c]) continue;
+      const v = grid[r][c].v;
+      sum += v;
+      if (adjacencyBonus) sum -= countAdjacent(grid, r, c, v) * adjacencyBonus;
+    }
+    return sum;
+  }
+
+  function botChoose(botId) {
     const g = gameState.grids[botId];
+    const diff = gameState.botDifficulty || 'moyen';
     const hidden = [];
-    for (let r = 0; r < GRID; r++)
-      for (let c = 0; c < GRID; c++)
-        if (g[r][c] && !g[r][c].revealed) hidden.push({ row: r, col: c });
+    for(let r=0;r<GRID;r++) for(let c=0;c<GRID;c++)
+      if(g[r][c] && !g[r][c].revealed) hidden.push({row:r,col:c});
     if (!hidden.length) return;
-    const pick = hidden[Math.floor(Math.random() * hidden.length)];
-    handlePlayerAction(botId, { type: 'choose_card', row: pick.row, col: pick.col });
+
+    if (diff === 'facile') {
+      // Aléatoire parmi les extrémités
+      const ext = hidden.filter(({row,col})=>col===0||col===GRID-1||row===0||row===GRID-1);
+      const pool = ext.length ? ext : hidden;
+      const pick = pool[Math.floor(Math.random()*pool.length)];
+      handlePlayerAction(botId,{type:'choose_card',row:pick.row,col:pick.col});
+      return;
+    }
+
+    // Moyen/Fort : choisir une carte à une extrémité (push garanti),
+    // en préférant celles avec des voisins de même valeur (pour libérer des opportunités d'annulation)
+    const ext = hidden.filter(({row,col})=>col===0||col===GRID-1||row===0||row===GRID-1);
+    const pool = ext.length ? ext : hidden;
+    let best = pool[0], bestAdj = -1;
+    pool.forEach(({row,col}) => {
+      const adj = countAdjacent(g, row, col, g[row][col].v);
+      if (adj > bestAdj) { bestAdj=adj; best={row,col}; }
+    });
+    handlePlayerAction(botId,{type:'choose_card',row:best.row,col:best.col});
   }
 
   function botPickCenter(botId) {
     if (!gameState.centerCards.length) return;
     const diff = gameState.botDifficulty || 'moyen';
-    let bestIdx = 0;
-    if (diff !== 'facile') {
-      // Pick lowest value card
-      let minV = Infinity;
-      gameState.centerCards.forEach((c, i) => { if (c.v < minV) { minV = c.v; bestIdx = i; } });
-    } else {
-      bestIdx = Math.floor(Math.random() * gameState.centerCards.length);
+    const g = gameState.grids[botId];
+
+    if (diff === 'facile') {
+      handlePlayerAction(botId,{type:'pick_center',centerIdx:Math.floor(Math.random()*gameState.centerCards.length)});
+      return;
     }
-    handlePlayerAction(botId, { type: 'pick_center', centerIdx: bestIdx });
+
+    // Moyen : choisit la carte de valeur minimale
+    // Fort   : tient compte des adjacences potentielles dans sa propre grille
+    let bestIdx = 0, bestScore = Infinity;
+    gameState.centerCards.forEach((cc, i) => {
+      let score = cc.v; // base : valeur brute (on veut du bas)
+      if (diff === 'fort') {
+        // Bonus si on a déjà cette valeur dans notre grille (potentiel d'annulation)
+        let hasInGrid = false;
+        for(let r=0;r<GRID;r++) for(let c=0;c<GRID;c++)
+          if(g[r][c] && g[r][c].v===cc.v) hasInGrid=true;
+        if (hasInGrid) score -= 8; // fort malus sur le score = on favorise cette carte
+      }
+      if (score < bestScore) { bestScore=score; bestIdx=i; }
+    });
+    handlePlayerAction(botId,{type:'pick_center',centerIdx:bestIdx});
   }
 
   function botPush(botId) {
     const v = gameState.pendingCard.v;
     const g = gameState.grids[botId];
     const diff = gameState.botDifficulty || 'moyen';
+    const moves = getValidPushMoves(g);
+    if (!moves.length) return;
 
     if (diff === 'facile') {
-      // Random valid push
-      const dirs = ['row_right','row_left','col_down','col_up'];
-      handlePlayerAction(botId, { type: 'push_card', dir: dirs[Math.floor(Math.random() * 4)], idx: Math.floor(Math.random() * GRID) });
-      return;
+      const m = moves[Math.floor(Math.random()*moves.length)];
+      handlePlayerAction(botId,{type:'push_card',dir:m.dir,idx:m.idx}); return;
     }
 
-    // Find the row/col with the highest current sum — push that one out
-    let bestDir = 'row_left', bestIdx = 0, bestScore = -1;
-    for (let i = 0; i < GRID; i++) {
-      // Row sum (eject rightmost going left, or leftmost going right)
-      const rowSum = [0,1,2,3].reduce((s, c) => s + (g[i][c]?.v || 0), 0);
-      const colSum = [0,1,2,3].reduce((s, r) => s + (g[r][i]?.v || 0), 0);
-      // Prefer to eject highest-value card
-      const rightEject = g[i][GRID-1]?.v || 0;
-      const leftEject = g[i][0]?.v || 0;
-      const botEject = g[GRID-1][i]?.v || 0;
-      const topEject = g[0][i]?.v || 0;
-      [
-        { dir: 'row_left',  idx: i, gain: rightEject - v },
-        { dir: 'row_right', idx: i, gain: leftEject - v },
-        { dir: 'col_up',    idx: i, gain: botEject - v },
-        { dir: 'col_down',  idx: i, gain: topEject - v },
-      ].forEach(opt => { if (opt.gain > bestScore) { bestScore = opt.gain; bestDir = opt.dir; bestIdx = opt.idx; } });
-    }
-    handlePlayerAction(botId, { type: 'push_card', dir: bestDir, idx: bestIdx });
+    // Moyen : minimise le score visible après push
+    // Fort  : minimise score visible ET maximise les adjacences de même valeur (annulations futures)
+    let bestMove = moves[0], bestScore = Infinity;
+    moves.forEach(m => {
+      const copy = g.map(row => row.map(cell => cell?{...cell}:null));
+      applyPush(copy, m.dir, m.idx, v);
+      let score = scoreGrid(copy, diff==='fort' ? 3 : 0);
+      if (score < bestScore) { bestScore=score; bestMove=m; }
+    });
+    handlePlayerAction(botId,{type:'push_card',dir:bestMove.dir,idx:bestMove.idx});
   }
 
   return { maybePlay, clearTimers };
@@ -1232,10 +1270,8 @@ const Render = (() => {
       const isPushing = iAmPushing && isMe;
       const discoTag = p.disconnected ? '<span class="reconnecting-badge">⚠️</span>' : '';
 
-      // Calculer score visible
-      const grid = gameState.grids[p.id];
-      let visScore = 0;
-      if (grid) for (let r = 0; r < GRID; r++) for (let c = 0; c < GRID; c++) if (grid[r][c]?.revealed) visScore += grid[r][c].v;
+      // Score visible avec annulations simulées
+      const visScore = calcVisibleScore(p.id);
 
       html += `<div class="player-zone pcolor-${colorIdx} ${isDekalHolder ? 'dekal-turn' : ''} ${isMe ? 'is-me' : ''}">
         <div class="player-header">
@@ -1259,8 +1295,7 @@ const Render = (() => {
         const colorIdx = gameState.players.findIndex(pl => pl.id === p.id) % 6;
         const isDekalHolder = p.id === dekalPlayer?.id;
         const grid = gameState.grids[p.id];
-        let visScore = 0;
-        if (grid) for (let r = 0; r < GRID; r++) for (let c = 0; c < GRID; c++) if (grid[r][c]?.revealed) visScore += grid[r][c].v;
+        const visScore = calcVisibleScore(p.id);
         const chosen = gameState.chosen?.[p.id];
         let miniHtml = '<div class="compact-mini-grid">';
         if (grid) for (let r = 0; r < GRID; r++) for (let c = 0; c < GRID; c++) {
@@ -1321,64 +1356,65 @@ const Render = (() => {
 
   function buildPushUI(pid, cardV) {
     const grid = gameState.grids[pid];
-    // Taille carte + gap : 52px carte, 4px gap entre cartes
-    const cellSize = 52, gap = 4;
-    const gridPx = GRID * cellSize + (GRID - 1) * gap; // = 220px
-    const arrowW = 28, arrowH = cellSize; // flèche latérale : même hauteur que carte
-    const arrowColH = 28, arrowColW = cellSize; // flèche colonne : même largeur que carte
+    const validMoves = getValidPushMoves(grid);
+    const has = (dir, idx) => validMoves.some(m => m.dir === dir && m.idx === idx);
+    const C = 52, G = 4, A = 28;
 
-    let h = `<div style="display:inline-flex;flex-direction:column;align-items:center;gap:${gap}px">`;
+    // CSS grid 6×6 :
+    // col 1 = flèches row_right (→) | cols 2-5 = cartes | col 6 = flèches row_left (←)
+    // row 1 = flèches col_up (↓)    | rows 2-5 = cartes  | row 6 = flèches col_down (↑)
+    const colTemplate = `${A}px repeat(${GRID}, ${C}px) ${A}px`;
+    const rowTemplate = `${A}px repeat(${GRID}, ${C}px) ${A}px`;
 
-    // ── Flèches du haut (col_down) ──
-    h += `<div style="display:flex;gap:${gap}px;margin-left:${arrowW + gap}px">`;
-    for (let c = 0; c < GRID; c++)
-      h += `<button class="push-btn col-btn" style="width:${arrowColW}px;height:${arrowColH}px" onclick="performAction({type:'push_card',dir:'col_down',idx:${c}})" title="Insérer col ${c+1} par le haut">↓</button>`;
-    h += '</div>';
+    let h = `<div style="display:inline-grid;
+      grid-template-columns:${colTemplate};
+      grid-template-rows:${rowTemplate};
+      gap:${G}px;">`;
 
-    // ── Rangée centrale : flèches gauche | grille | flèches droite ──
-    h += `<div style="display:flex;gap:${gap}px;align-items:flex-start">`;
+    const btn = (dir, idx, symbol, gc, gr) =>
+      `<button class="push-btn"
+        style="width:${dir.startsWith('row')?A:C}px;height:${dir.startsWith('row')?C:A}px;grid-column:${gc};grid-row:${gr}"
+        onclick="performAction({type:'push_card',dir:'${dir}',idx:${idx}})">${symbol}</button>`;
+    const empty = (gc, gr, w, hh) =>
+      `<div style="grid-column:${gc};grid-row:${gr};width:${w}px;height:${hh}px"></div>`;
 
-    // Flèches gauche (row_right = insérer à gauche, pousse vers droite)
-    h += `<div style="display:flex;flex-direction:column;gap:${gap}px">`;
-    for (let r = 0; r < GRID; r++)
-      h += `<button class="push-btn" style="width:${arrowW}px;height:${arrowH}px" onclick="performAction({type:'push_card',dir:'row_right',idx:${r}})" title="Insérer ligne ${r+1} par la gauche">→</button>`;
-    h += '</div>';
-
-    // Grille
-    h += '<div class="grid-wrap">';
+    // Flèches gauche (row_right) et droite (row_left)
     for (let r = 0; r < GRID; r++) {
-      h += '<div class="grid-row">';
+      if (has('row_right', r)) h += btn('row_right', r, '→', 1, r+2);
+      else h += empty(1, r+2, A, C);
+      if (has('row_left',  r)) h += btn('row_left',  r, '←', GRID+2, r+2);
+      else h += empty(GRID+2, r+2, A, C);
+    }
+
+    // Flèches haut (col_up = insère en haut, cartes descendent → symbole ↓)
+    // et bas (col_down = insère en bas, cartes montent → symbole ↑)
+    for (let c = 0; c < GRID; c++) {
+      if (has('col_up',   c)) h += btn('col_up',   c, '↓', c+2, 1);
+      else h += empty(c+2, 1, C, A);
+      if (has('col_down', c)) h += btn('col_down', c, '↑', c+2, GRID+2);
+      else h += empty(c+2, GRID+2, C, A);
+    }
+
+    // Cartes
+    for (let r = 0; r < GRID; r++) {
       for (let c = 0; c < GRID; c++) {
         const cell = grid[r][c];
-        if (!cell) h += `<div class="card" style="background:rgba(255,255,255,.04);border:2px dashed rgba(255,255,255,.2);font-size:.6em;color:rgba(255,255,255,.3)">✦</div>`;
-        else if (!cell.revealed) h += '<div class="card face-down"></div>';
-        else h += `<div class="card ${cvClass(cell.v)}">${cell.v}</div>`;
+        const gc = c+2, gr = r+2;
+        if (!cell) {
+          h += `<div class="card" style="grid-column:${gc};grid-row:${gr};background:rgba(233,69,96,.08);border:2px dashed rgba(233,69,96,.5);font-size:1.2em;color:rgba(233,69,96,.5)">◯</div>`;
+        } else if (!cell.revealed) {
+          h += `<div class="card face-down" style="grid-column:${gc};grid-row:${gr}"></div>`;
+        } else {
+          h += `<div class="card ${cvClass(cell.v)}" style="grid-column:${gc};grid-row:${gr}">${cell.v}</div>`;
+        }
       }
-      h += '</div>';
     }
+
     h += '</div>';
-
-    // Flèches droite (row_left = insérer à droite, pousse vers gauche)
-    h += `<div style="display:flex;flex-direction:column;gap:${gap}px">`;
-    for (let r = 0; r < GRID; r++)
-      h += `<button class="push-btn" style="width:${arrowW}px;height:${arrowH}px" onclick="performAction({type:'push_card',dir:'row_left',idx:${r}})" title="Insérer ligne ${r+1} par la droite">←</button>`;
-    h += '</div>';
-
-    h += '</div>'; // fin rangée centrale
-
-    // ── Flèches du bas (col_up) ──
-    h += `<div style="display:flex;gap:${gap}px;margin-left:${arrowW + gap}px">`;
-    for (let c = 0; c < GRID; c++)
-      h += `<button class="push-btn col-btn" style="width:${arrowColW}px;height:${arrowColH}px" onclick="performAction({type:'push_card',dir:'col_up',idx:${c}})" title="Insérer col ${c+1} par le bas">↑</button>`;
-    h += '</div>';
-
-    // Carte à insérer
-    h += `<div style="margin-top:6px;display:flex;align-items:center;gap:10px;font-size:.8em;color:#aaa">
+    h += `<div style="margin-top:8px;display:flex;align-items:center;gap:10px;font-size:.8em;color:#aaa">
       <span>Insérer :</span>
       <div class="card ${cvClass(cardV)}" style="pointer-events:none;box-shadow:0 0 12px rgba(245,166,35,.5);border-color:#f5a623">${cardV}</div>
     </div>`;
-
-    h += '</div>';
     return h;
   }
 
@@ -1387,15 +1423,17 @@ const Render = (() => {
     const sub = document.getElementById('round-scores-subtitle');
     if (sub) sub.textContent = 'Les cartes adjacentes identiques ont été annulées';
     const sorted = [...gameState.players].sort((a, b) => (scores[a.id] || 0) - (scores[b.id] || 0));
-    let html = '<thead><tr><th>Joueur</th><th>Score</th></tr></thead><tbody>';
+    const winner = sorted[0];
+    let html = '<thead><tr><th>Joueur</th><th>Score final</th></tr></thead><tbody>';
     sorted.forEach((p, i) => {
       const s = scores[p.id] || 0;
       const isMe = p.id === myPlayerId;
-      html += `<tr${i===0?' class="winner"':''}><td>${p.name}${isMe?'<br><small style="color:#aaa;font-size:.72em">vous</small>':''}</td><td class="total">${s}</td></tr>`;
+      html += `<tr${i===0?' class="winner"':''}><td>${i===0?'🏆 ':''}${p.name}${p.isBot?' 🤖':''}${isMe?'<br><small style="color:#aaa;font-size:.72em">vous</small>':''}</td><td class="total">${s}</td></tr>`;
     });
     html += '</tbody>';
     document.getElementById('round-scores-table').innerHTML = html;
     document.getElementById('next-round-btn').style.display = isHost ? '' : 'none';
+    Leaderboard.render('end-leaderboard');
   }
 
   return { fromState, renderLobby };
