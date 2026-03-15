@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Dékal">
 <link rel="manifest" id="pwa-manifest">
-<title>Dékal Multijoueur v1.2.2</title>
+<title>Dékal Multijoueur v1.2.5</title>
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/davidshimjs-qrcodejs@0.0.2/qrcode.min.js"></script>
 <style>
@@ -33,21 +33,18 @@ input::placeholder{color:#888}
 
 /* ── CARDS ── */
 .card{
-  width:46px;height:46px;border-radius:7px;
+  width:46px;height:64px;border-radius:7px;
   display:flex;align-items:center;justify-content:center;
-  font-size:1.1em;font-weight:900;cursor:pointer;
+  font-size:1.15em;font-weight:900;cursor:pointer;
   transition:transform .15s,box-shadow .15s,opacity .2s;
   position:relative;border:2px solid rgba(255,255,255,.15);
   flex-shrink:0;-webkit-font-smoothing:antialiased;
   background:#2a2a4a;color:#fff;
 }
-.card:active{transform:scale(.93)}
 .card.face-down{
-  background:linear-gradient(135deg,#c0392b,#922b21);
-  color:transparent;cursor:pointer;
-  border-color:rgba(200,60,40,.5);
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 52'%3E%3Crect width='52' height='52' rx='7' fill='%23a93226'/%3E%3Crect x='3' y='3' width='46' height='46' rx='5' fill='none' stroke='rgba(255,255,255,0.2)' stroke-width='1'/%3E%3Ctext x='26' y='22' text-anchor='middle' font-family='Arial Black,Arial,sans-serif' font-weight='900' font-size='8' fill='rgba(255,255,255,0.85)' letter-spacing='1'%3ED%C3%89KAL%3C/text%3E%3Cline x1='10' y1='27' x2='42' y2='27' stroke='rgba(255,255,255,0.25)' stroke-width='0.8'/%3E%3Ctext x='26' y='38' text-anchor='middle' font-family='Arial,sans-serif' font-size='13' fill='rgba(255,255,255,0.3)'%3E%E2%97%86%3C/text%3E%3C/svg%3E");
-  background-size:cover;
+  background-image:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 46 64'><defs><linearGradient id='bg' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%231a2a4e'/><stop offset='100%25' stop-color='%230d1a36'/></linearGradient><linearGradient id='og' x1='0%25' y1='0%25' x2='100%25' y2='0%25'><stop offset='0%25' stop-color='%23f5a623'/><stop offset='100%25' stop-color='%23e94560'/></linearGradient></defs><rect width='46' height='64' rx='6' fill='url(%23bg)'/><rect x='2.5' y='2.5' width='41' height='59' rx='4.5' fill='none' stroke='rgba(255,255,255,0.18)' stroke-width='1'/><rect x='4.5' y='4.5' width='37' height='55' rx='3' fill='none' stroke='rgba(255,255,255,0.07)' stroke-width='0.5'/><g transform='translate(23,32) rotate(-35)'><text text-anchor='middle' dominant-baseline='middle' font-family='Arial Black,Arial,sans-serif' font-weight='900' font-size='9' fill='url(%23og)' letter-spacing='1.5'>D%C3%89KAL</text></g><circle cx='6' cy='7' r='1.5' fill='rgba(255,255,255,0.18)'/><circle cx='40' cy='7' r='1.5' fill='rgba(255,255,255,0.18)'/><circle cx='6' cy='57' r='1.5' fill='rgba(255,255,255,0.18)'/><circle cx='40' cy='57' r='1.5' fill='rgba(255,255,255,0.18)'/></svg>");
+  background-size:cover;background-color:transparent;
+  border-color:rgba(30,80,180,.5);
 }
 .card.face-down::after{content:none}
 .card.selectable{animation:cardPulse 1s infinite;cursor:pointer}
@@ -109,7 +106,7 @@ input::placeholder{color:#888}
 /* ── CENTER AREA ── */
 .center-area{background:rgba(255,255,255,.04);border-radius:10px;padding:6px 10px;margin:3px 0;width:100%;max-width:700px;display:flex;flex-direction:column;align-items:center;gap:5px}
 .center-title{font-size:.72em;color:#aaa;text-transform:uppercase;letter-spacing:1px;font-weight:600}
-.center-cards-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;min-height:60px;align-items:center;padding-bottom:16px}
+.center-cards-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;min-height:70px;align-items:center}
 
 /* ── PLAYERS AREA ── */
 .players-area{width:100%;max-width:700px;display:flex;flex-direction:column;gap:5px;padding:2px 6px;overflow-y:auto;flex:1;min-height:0;padding-bottom:50px}
@@ -135,8 +132,8 @@ input::placeholder{color:#888}
 .compact-name{font-weight:600;font-size:.85em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .compact-detail{font-size:.72em;color:#aaa;margin-top:1px}
 .compact-mini-grid{display:grid;grid-template-columns:repeat(4,16px);gap:2px;flex-shrink:0}
-.mini-cell{width:16px;height:16px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:.5em;font-weight:700;border:1px solid rgba(255,255,255,.1)}
-.mini-cell.face-down{background:#922b21;color:transparent}
+.mini-cell{width:16px;height:22px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:.5em;font-weight:700;border:1px solid rgba(255,255,255,.1)}
+.mini-cell.face-down{background:#1a3a6e;color:transparent}
 
 /* ── GAME HEADER ── */
 .game-header{width:100%;max-width:700px;display:flex;flex-direction:column;align-items:center;padding:calc(2px + env(safe-area-inset-top,0px)) 8px 3px;background:rgba(255,255,255,.05);border-radius:8px;margin-bottom:3px;gap:1px;flex-shrink:0}
@@ -173,10 +170,11 @@ input::placeholder{color:#888}
 #conn-status{position:fixed;top:0;left:0;right:0;z-index:9999;display:flex;flex-direction:column;pointer-events:none}
 #conn-status-text{display:none;text-align:center;font-size:.72em;padding:4px 8px;font-weight:600}
 #conn-status.connecting #conn-status-text,#conn-status.reconnecting #conn-status-text{display:block;background:rgba(230,126,34,.9);color:#fff}
-#conn-status-bar{height:3px;background:transparent;width:0;transition:width .3s}
+#conn-status-bar{height:3px;background:transparent;width:0;transition:width .3s,opacity .4s}
 #conn-status.connecting #conn-status-bar{background:#e67e22}
 #conn-status.reconnecting #conn-status-bar{background:#e74c3c}
 #conn-status.connected #conn-status-bar{background:#2ecc71;width:100%!important}
+#conn-status.connected.hide-bar #conn-status-bar{opacity:0;width:100%!important}
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(0,0,0,.85);color:#fff;padding:10px 20px;border-radius:24px;font-size:.9em;opacity:0;pointer-events:none;z-index:200;transition:opacity .3s,transform .3s;white-space:nowrap;max-width:90vw;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 #fullscreen-btn{position:fixed;top:calc(6px + env(safe-area-inset-top,0px));right:max(10px,env(safe-area-inset-right,0px));z-index:500;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.2);color:#fff;width:36px;height:36px;border-radius:50%;display:none;align-items:center;justify-content:center;font-size:1em;padding:0;min-height:auto;cursor:pointer;backdrop-filter:blur(6px)}
@@ -267,7 +265,7 @@ input::placeholder{color:#888}
   const blob=new Blob([JSON.stringify(m)],{type:'application/manifest+json'});
   document.getElementById('pwa-manifest').href=URL.createObjectURL(blob);
 })();
-if('serviceWorker' in navigator){const sw=`const C='dekal-v1.2.2';self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',()=>clients.claim());`;navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});}
+if('serviceWorker' in navigator){const sw=`const C='dekal-v1.2.5';self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',()=>clients.claim());`;navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});}
 </script>
 </head>
 <body>
@@ -276,7 +274,7 @@ if('serviceWorker' in navigator){const sw=`const C='dekal-v1.2.2';self.addEventL
 <div id="splash-screen">
   <div class="splash-title">DÉKAL</div>
   <div class="splash-cards" id="splash-cards"></div>
-  <div class="splash-sub">v1.2.2</div>
+  <div class="splash-sub">v1.2.5</div>
   <div class="splash-tagline">crédits : claude.ai · @Pneubis</div>
   <div class="splash-progress"><div class="splash-progress-bar"></div></div>
   <script>
@@ -317,7 +315,7 @@ if('serviceWorker' in navigator){const sw=`const C='dekal-v1.2.2';self.addEventL
 <!-- SCREEN: MENU -->
 <div class="screen active" id="screen-menu">
   <h1>DÉKAL</h1>
-  <p style="font-size:.85em;color:rgba(255,255,255,.65);letter-spacing:3px;margin:-4px 0 10px;font-weight:600">v1.2.2</p>
+  <p style="font-size:.85em;color:rgba(255,255,255,.65);letter-spacing:3px;margin:-4px 0 10px;font-weight:600">v1.2.5</p>
   <p class="subtitle" style="margin-top:0">
     <button onclick="UI.showRules()" style="background:none;border:1px solid rgba(255,255,255,.25);color:#aaa;font-size:.8em;font-weight:600;padding:3px 12px;border-radius:20px;cursor:pointer;min-height:auto">ⓘ Règles</button>
     <button onclick="UI.showScoreOptions()" id="score-target-btn" style="background:none;border:1px solid rgba(245,166,35,.4);color:rgba(245,166,35,.8);font-size:.8em;font-weight:600;padding:3px 12px;border-radius:20px;cursor:pointer;min-height:auto;margin-left:8px">🎯 Score max : 50</button>
@@ -437,7 +435,7 @@ if('serviceWorker' in navigator){const sw=`const C='dekal-v1.2.2';self.addEventL
 <script>
 "use strict";
 // ============================================================
-// DÉKAL MULTIJOUEUR v1.2.2
+// DÉKAL MULTIJOUEUR v1.2.5
 //
 // RÈGLES EXACTES :
 // - 100 cartes Dékal numérotées
@@ -584,11 +582,21 @@ const UI = (() => {
     if(r)r.call(e).then(()=>{try{screen.orientation?.lock?.('portrait');}catch(e){}}).catch(()=>{});
   }
   function setConnStatus(status,msg) {
-    document.getElementById('conn-status').className=status;
+    const el = document.getElementById('conn-status');
+    el.className=status;
     _connMsg=msg||'';
     const t=document.getElementById('conn-status-text'); if(t)t.textContent=_connMsg;
     if(!status){clearInterval(_pTimer);setCP(0);}
+    if(status==='connected'){
+      // Barre verte → disparaît après 800ms
+      clearTimeout(_hideTimer);
+      _hideTimer=setTimeout(()=>{
+        el.classList.add('hide-bar');
+        setTimeout(()=>{ el.className=''; setCP(0); },400);
+      },800);
+    }
   }
+  let _hideTimer=null;
   let _pTimer=null,_connMsg='';
   function startConnProgress(dur,max) {
     clearInterval(_pTimer);setCP(0);
@@ -1312,10 +1320,8 @@ const Render = (() => {
       let ch = `<div class="center-title">🃏 Choisissez une carte</div><div class="center-cards-row">`;
       gameState.centerCards.forEach((cc, i) => {
         ch += `<div class="card ${cvClass(cc.v)}${canPickCenter ? ' center-choice' : ''}"
-          style="position:relative"
           onclick="${canPickCenter ? 'performAction({type:\'pick_center\',centerIdx:' + i + '})' : ''}">
           ${cc.v}
-          <div style="position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);font-size:.55em;color:#aaa;white-space:nowrap">${getPlayerName(cc.playerId)}</div>
         </div>`;
       });
       ch += '</div>';
@@ -1448,13 +1454,13 @@ const Render = (() => {
     const grid = gameState.grids[pid];
     const validMoves = getValidPushMoves(grid);
     const has = (dir, idx) => validMoves.some(m => m.dir === dir && m.idx === idx);
-    const C = 46, G = 3, A = 24;
+    const C = 46, CH = 64, G = 3, A = 24;
 
     // CSS grid 6×6 :
     // col 1 = flèches row_right (→) | cols 2-5 = cartes | col 6 = flèches row_left (←)
     // row 1 = flèches col_up (↓)    | rows 2-5 = cartes  | row 6 = flèches col_down (↑)
     const colTemplate = `${A}px repeat(${GRID}, ${C}px) ${A}px`;
-    const rowTemplate = `${A}px repeat(${GRID}, ${C}px) ${A}px`;
+    const rowTemplate = `${A}px repeat(${GRID}, ${CH}px) ${A}px`;
 
     let h = `<div style="display:inline-grid;
       grid-template-columns:${colTemplate};
@@ -1463,7 +1469,7 @@ const Render = (() => {
 
     const btn = (dir, idx, symbol, gc, gr) =>
       `<button class="push-btn"
-        style="width:${dir.startsWith('row')?A:C}px;height:${dir.startsWith('row')?C:A}px;grid-column:${gc};grid-row:${gr}"
+        style="width:${dir.startsWith('row')?A:C}px;height:${dir.startsWith('row')?CH:A}px;grid-column:${gc};grid-row:${gr}"
         onclick="performAction({type:'push_card',dir:'${dir}',idx:${idx}})">${symbol}</button>`;
     const empty = (gc, gr, w, hh) =>
       `<div style="grid-column:${gc};grid-row:${gr};width:${w}px;height:${hh}px"></div>`;
@@ -1471,9 +1477,9 @@ const Render = (() => {
     // Flèches gauche (row_right) et droite (row_left)
     for (let r = 0; r < GRID; r++) {
       if (has('row_right', r)) h += btn('row_right', r, '→', 1, r+2);
-      else h += empty(1, r+2, A, C);
+      else h += empty(1, r+2, A, CH);
       if (has('row_left',  r)) h += btn('row_left',  r, '←', GRID+2, r+2);
-      else h += empty(GRID+2, r+2, A, C);
+      else h += empty(GRID+2, r+2, A, CH);
     }
 
     // Flèches haut (col_up = insère en haut, cartes descendent → symbole ↓)
