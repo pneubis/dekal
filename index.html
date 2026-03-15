@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Dékal">
 <link rel="manifest" id="pwa-manifest">
-<title>Dékal Multijoueur v1.1.8</title>
+<title>Dékal Multijoueur v1.2.0</title>
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/davidshimjs-qrcodejs@0.0.2/qrcode.min.js"></script>
 <style>
@@ -267,7 +267,7 @@ input::placeholder{color:#888}
   const blob=new Blob([JSON.stringify(m)],{type:'application/manifest+json'});
   document.getElementById('pwa-manifest').href=URL.createObjectURL(blob);
 })();
-if('serviceWorker' in navigator){const sw=`const C='dekal-v1.1.8';self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',()=>clients.claim());`;navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});}
+if('serviceWorker' in navigator){const sw=`const C='dekal-v1.2.0';self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',()=>clients.claim());`;navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});}
 </script>
 </head>
 <body>
@@ -276,7 +276,7 @@ if('serviceWorker' in navigator){const sw=`const C='dekal-v1.1.8';self.addEventL
 <div id="splash-screen">
   <div class="splash-title">DÉKAL</div>
   <div class="splash-cards" id="splash-cards"></div>
-  <div class="splash-sub">v1.1.8</div>
+  <div class="splash-sub">v1.2.0</div>
   <div class="splash-tagline">crédits : claude.ai · @Pneubis</div>
   <div class="splash-progress"><div class="splash-progress-bar"></div></div>
   <script>
@@ -317,9 +317,10 @@ if('serviceWorker' in navigator){const sw=`const C='dekal-v1.1.8';self.addEventL
 <!-- SCREEN: MENU -->
 <div class="screen active" id="screen-menu">
   <h1>DÉKAL</h1>
-  <p style="font-size:.85em;color:rgba(255,255,255,.65);letter-spacing:3px;margin:-4px 0 10px;font-weight:600">v1.1.8</p>
+  <p style="font-size:.85em;color:rgba(255,255,255,.65);letter-spacing:3px;margin:-4px 0 10px;font-weight:600">v1.2.0</p>
   <p class="subtitle" style="margin-top:0">
     <button onclick="UI.showRules()" style="background:none;border:1px solid rgba(255,255,255,.25);color:#aaa;font-size:.8em;font-weight:600;padding:3px 12px;border-radius:20px;cursor:pointer;min-height:auto">ⓘ Règles</button>
+    <button onclick="UI.showScoreOptions()" id="score-target-btn" style="background:none;border:1px solid rgba(245,166,35,.4);color:rgba(245,166,35,.8);font-size:.8em;font-weight:600;padding:3px 12px;border-radius:20px;cursor:pointer;min-height:auto;margin-left:8px">🎯 Score max : 50</button>
   </p>
   <div style="margin:12px 0;width:100%;max-width:320px">
     <input type="text" id="player-name" placeholder="Votre pseudo" maxlength="12" autocomplete="off">
@@ -421,12 +422,13 @@ if('serviceWorker' in navigator){const sw=`const C='dekal-v1.1.8';self.addEventL
 <!-- SCREEN: ROUND SCORES -->
 <div class="screen" id="screen-round-scores" style="justify-content:flex-start;padding-top:calc(6px + env(safe-area-inset-top,0px))">
   <div class="score-screen-content">
-    <h2 style="margin-bottom:2px;align-self:flex-start">🏁 Fin de partie</h2>
+    <h2 style="margin-bottom:2px;align-self:flex-start" id="round-scores-title">📊 Fin de manche</h2>
     <p class="subtitle" style="margin-bottom:8px;align-self:flex-start" id="round-scores-subtitle"></p>
     <table class="scores-table" id="round-scores-table"></table>
-    <div class="leaderboard-box" id="end-leaderboard" style="margin-top:12px"></div>
+    <div class="leaderboard-box" id="end-leaderboard" style="margin-top:12px;display:none"></div>
     <div class="btn-group" style="margin-top:16px;width:100%;justify-content:center">
-      <button id="next-round-btn" onclick="App.nextRound()">Rejouer →</button>
+      <button id="next-round-btn" onclick="App.nextRound()" style="display:none">Manche suivante →</button>
+      <button id="replay-btn" onclick="App.nextRound()" style="display:none">🔄 Rejouer</button>
       <button class="danger" onclick="App.backToMenu(true)" style="min-height:48px;padding:12px 20px;font-size:.9em">🏠 Menu</button>
     </div>
   </div>
@@ -435,7 +437,7 @@ if('serviceWorker' in navigator){const sw=`const C='dekal-v1.1.8';self.addEventL
 <script>
 "use strict";
 // ============================================================
-// DÉKAL MULTIJOUEUR v1.1.8
+// DÉKAL MULTIJOUEUR v1.2.0
 //
 // RÈGLES EXACTES :
 // - 100 cartes Dékal numérotées
@@ -599,6 +601,27 @@ const UI = (() => {
   function confirmResetLeaderboard() { showModal('🗑 Réinitialiser','Toutes les statistiques seront supprimées.',[{text:'Annuler',action:'UI.closeModal()'},{text:'⚠️ Confirmer',action:'UI.resetLeaderboard()'}]); }
   function resetLeaderboard() { Leaderboard.reset();closeModal();Leaderboard.render('menu-leaderboard');toast('Classement réinitialisé'); }
   function confirmQuitGame() { showModal('Quitter ?','Que souhaitez-vous faire ?',[{text:'Continuer',action:'UI.closeModal()'},{text:'🏠 Menu',action:'UI.closeModal();App.backToMenu(true)'},{text:'✕ Fermer',action:'UI.closeModal();window.close()'}]); }
+
+  function showScoreOptions() {
+    const current = (typeof App !== 'undefined' && App._targetScore) || 50;
+    const opts = [30, 50, 75, 100, 150];
+    const btnHtml = opts.map(s =>
+      `<button onclick="UI.setTargetScore(${s})" style="flex:1;padding:10px 4px;font-size:.9em;font-weight:700;border-radius:10px;background:${s===current?'rgba(245,166,35,.3)':'rgba(255,255,255,.08)'};border:2px solid ${s===current?'#f5a623':'rgba(255,255,255,.15)'};color:#fff;cursor:pointer;min-height:auto;transition:all .2s">${s}</button>`
+    ).join('');
+    showModal('🎯 Score maximum',
+      `<div style="font-size:.85em;color:#bbb;margin-bottom:12px">La partie se termine quand un joueur atteint ce score cumulé. Le joueur avec le score total le plus bas gagne.</div>
+       <div style="display:flex;gap:6px;flex-wrap:wrap">${btnHtml}</div>`,
+      [{text:'Fermer', action:'UI.closeModal()'}]
+    );
+  }
+
+  function setTargetScore(val) {
+    if (typeof App !== 'undefined') App._targetScore = val;
+    const btn = document.getElementById('score-target-btn');
+    if (btn) btn.textContent = '🎯 Score max : ' + val;
+    closeModal();
+    toast('Score max : ' + val + ' pts');
+  }
   function showGameInProgressWarning() {
     const btn=document.getElementById('join-btn'),banner=document.getElementById('game-in-progress-banner');
     if(btn){btn.disabled=true;btn.style.opacity='0.4';btn.textContent='🔒 Rejoindre';}
@@ -610,7 +633,7 @@ const UI = (() => {
     if(btn){btn.disabled=false;btn.style.opacity='';btn.textContent='🔗 Rejoindre une partie';}
     if(banner)banner.style.display='none';
   }
-  return { showScreen,toast,showModal,closeModal,showRules,_doFullscreen,setConnStatus,startConnProgress,finishConnProgress,confirmResetLeaderboard,resetLeaderboard,confirmQuitGame,showGameInProgressWarning,resetJoinButton };
+  return { showScreen,toast,showModal,closeModal,showRules,_doFullscreen,setConnStatus,startConnProgress,finishConnProgress,confirmResetLeaderboard,resetLeaderboard,confirmQuitGame,showGameInProgressWarning,resetJoinButton,showScoreOptions,setTargetScore };
 })();
 
 // ── ACTION LOG ──
@@ -854,6 +877,7 @@ function initRound() {
     chosen[p.id] = null;
   });
   gameState.phase = 'playing';
+  gameState.roundNumber = (gameState.roundNumber || 0) + 1;
   gameState.turn = 0;
   gameState.subPhase = 'choose';
   gameState.dekalIdx = 0;
@@ -996,10 +1020,21 @@ function endGame() {
     for(let r=0;r<GRID;r++) for(let c=0;c<GRID;c++) if(gameState.grids[p.id][r][c]) s+=gameState.grids[p.id][r][c].v;
     scores[p.id]=s; gameState.totalScores[p.id]=(gameState.totalScores[p.id]||0)+s;
   });
-  gameState.roundScores=scores; gameState.phase='game_over';
-  const sorted=[...gameState.players].sort((a,b)=>(scores[a.id]||0)-(scores[b.id]||0));
-  gameState.players.forEach(p=>Leaderboard.update(p.name,p.id===sorted[0].id));
-  try{localStorage.removeItem('dekal_activeRoom');}catch(e){}
+  gameState.roundScores=scores;
+  gameState.roundNumber=(gameState.roundNumber||1); // déjà incrémenté dans initRound
+
+  // Vérifier si la partie est terminée (un joueur a atteint ou dépassé le score cible)
+  const target = gameState.targetScore || 50;
+  const gameOver = gameState.players.some(p => (gameState.totalScores[p.id]||0) >= target);
+
+  if (gameOver) {
+    gameState.phase='game_over';
+    const sorted=[...gameState.players].sort((a,b)=>(gameState.totalScores[a.id]||0)-(gameState.totalScores[b.id]||0));
+    gameState.players.forEach(p=>Leaderboard.update(p.name,p.id===sorted[0].id));
+    try{localStorage.removeItem('dekal_activeRoom');}catch(e){}
+  } else {
+    gameState.phase='round_end';
+  }
   Sound.play('win'); Network.broadcastState();
 }
 
@@ -1204,6 +1239,7 @@ const Render = (() => {
         UI.showScreen('screen-game');
         scheduleRender();
         break;
+      case 'round_end':
       case 'game_over':
         UI.showScreen('screen-round-scores');
         renderScores();
@@ -1245,7 +1281,7 @@ const Render = (() => {
 
     const turn = (gameState.turn || 0);
     const dekalPlayer = gameState.players[gameState.dekalIdx];
-    roundEl.textContent = 'Tour ' + (turn + 1) + '/' + TOTAL_TURNS + '  ·  🏅 ' + (dekalPlayer?.name || '?');
+    roundEl.textContent = 'M' + (gameState.roundNumber||1) + '  ·  Tour ' + (turn + 1) + '/' + TOTAL_TURNS + '  ·  🏅 ' + (dekalPlayer?.name || '?');
 
     const sub = gameState.subPhase;
     const iAmDekal = dekalPlayer?.id === myPlayerId;
@@ -1452,21 +1488,51 @@ const Render = (() => {
   }
 
   function renderScores() {
+    const isGameOver = gameState.phase === 'game_over';
     const scores = gameState.roundScores || {};
+    const target = gameState.targetScore || 50;
+    const roundNum = gameState.roundNumber || 1;
+
+    // Titre
+    const titleEl = document.getElementById('round-scores-title');
+    if (titleEl) titleEl.textContent = isGameOver ? '🏆 Fin de partie' : '📊 Manche ' + roundNum;
+
     const sub = document.getElementById('round-scores-subtitle');
-    if (sub) sub.textContent = 'Les cartes adjacentes identiques ont été annulées';
-    const sorted = [...gameState.players].sort((a, b) => (scores[a.id] || 0) - (scores[b.id] || 0));
-    const winner = sorted[0];
-    let html = '<thead><tr><th>Joueur</th><th>Score final</th></tr></thead><tbody>';
+    if (sub) sub.textContent = isGameOver
+      ? 'Score cible ' + target + ' pts atteint — Victoire !'
+      : 'Cartes adjacentes identiques annulées · Cible : ' + target + ' pts';
+
+    // Trier par score total croissant
+    const sorted = [...gameState.players].sort((a, b) =>
+      (gameState.totalScores[a.id]||0) - (gameState.totalScores[b.id]||0)
+    );
+
+    // Tableau : Joueur | Cette manche | Total cumulé
+    let html = `<thead><tr><th>Joueur</th><th>Manche ${roundNum}</th><th>Total</th></tr></thead><tbody>`;
     sorted.forEach((p, i) => {
-      const s = scores[p.id] || 0;
+      const round = scores[p.id] || 0;
+      const total = gameState.totalScores[p.id] || 0;
       const isMe = p.id === myPlayerId;
-      html += `<tr${i===0?' class="winner"':''}><td>${i===0?'🏆 ':''}${p.name}${p.isBot?' 🤖':''}${isMe?'<br><small style="color:#aaa;font-size:.72em">vous</small>':''}</td><td class="total">${s}</td></tr>`;
+      const overLimit = total >= target;
+      html += `<tr${i===0?' class="winner"':''}>
+        <td>${isGameOver && i===0 ? '🏆 ' : ''}${p.name}${p.isBot?' 🤖':''}${isMe?'<br><small style="color:#aaa;font-size:.72em">vous</small>':''}</td>
+        <td>${round}</td>
+        <td class="total" style="${overLimit?'color:#e74c3c':''}">${total}${overLimit?' ⚠️':''}</td>
+      </tr>`;
     });
     html += '</tbody>';
     document.getElementById('round-scores-table').innerHTML = html;
-    document.getElementById('next-round-btn').style.display = isHost ? '' : 'none';
-    Leaderboard.render('end-leaderboard');
+
+    // Boutons selon phase
+    const nextBtn = document.getElementById('next-round-btn');
+    const replayBtn = document.getElementById('replay-btn');
+    const lbBox = document.getElementById('end-leaderboard');
+    if (nextBtn) nextBtn.style.display = (!isGameOver && isHost) ? '' : 'none';
+    if (replayBtn) replayBtn.style.display = (isGameOver && isHost) ? '' : 'none';
+    if (lbBox) {
+      lbBox.style.display = isGameOver ? '' : 'none';
+      if (isGameOver) Leaderboard.render('end-leaderboard');
+    }
   }
 
   return { fromState, renderLobby };
@@ -1484,6 +1550,8 @@ const App = (() => {
     players.forEach(p => ts[p.id] = 0);
     return {
       phase: 'lobby', isSolo, botDifficulty: botDiff,
+      targetScore: App._targetScore || 50,
+      roundNumber: 0,
       players, totalScores: ts,
       grids: {}, chosen: {}, centerCards: [], pushQueue: [],
       turn: 0, dekalIdx: 0, subPhase: 'choose',
@@ -1616,12 +1684,20 @@ const App = (() => {
   function startGame() {
     if (!isHost || !gameState || gameState.players.length < 2) return;
     gameState.totalScores = {};
+    gameState.roundNumber = 0;
     gameState.players.forEach(p => gameState.totalScores[p.id] = 0);
     initRound();
   }
 
   function nextRound() {
     if (!isHost || !gameState) return;
+    if (gameState.phase === 'game_over') {
+      // Rejouer = nouvelle partie complète, reset tout
+      gameState.totalScores = {};
+      gameState.roundNumber = 0;
+      gameState.players.forEach(p => gameState.totalScores[p.id] = 0);
+    }
+    // round_end = manche suivante, on garde totalScores
     gameState.roundScores = {};
     initRound();
   }
@@ -1662,6 +1738,7 @@ const App = (() => {
 
   return { showJoinScreen, createSoloGame, createGame, joinGame, checkRoomStatus, switchToMulti, setBotDifficulty, copyCode, leaveLobby, backToMenu, startGame, nextRound, kickPlayer, confirmKickPlayer, checkResume, resumeGame, dismissResume };
 })();
+App._targetScore = 50; // Score cible par défaut
 
 // ── HELPERS GLOBAUX ──
 function showWaitingApproval() {
