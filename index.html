@@ -799,7 +799,7 @@ const ActionLog = (() => {
 // 8. NETWORK — Couche PeerJS (identique à Skyjo)
 // ============================================================
 const Network = (() => {
-  const PEER_SERVER_HOST = 'dekal-yha3.onrender.com';
+  const PEER_SERVER_HOST = 'skyjo-i51h.onrender.com';
   const PEER_SERVER_PATH = '/peerjs';
   const PEER_SERVER_HOST_FALLBACK = '0.peerjs.com';
   const PEER_SERVER_PATH_FALLBACK = '/';
@@ -1006,10 +1006,14 @@ const Network = (() => {
   return { initPeer, setupHostListeners, tryReconnect, scheduleReconnect, attemptHostMigration,
     broadcastState, broadcastToast, broadcastLog, broadcastBoom, broadcastPeerList,
     sendToHost, generateRoomCode, approveJoin, rejectJoin,
+    handleClientMessage,
     isPending: id => !!pendingRequests[id],
     removePending: id => { delete pendingRequests[id]; renderJoinRequests(); }
   };
 })();
+
+// Alias global pour joinGame
+function _handleClientMsg(data) { Network.handleClientMessage(data); }
 
 // ============================================================
 // 9. GAME LOGIC — Règles Dékal
@@ -1584,7 +1588,6 @@ const Handlers = (() => {
 // ============================================================
 const App = (() => {
   let _botDifficulty = 'moyen';
-  App._targetScore = END_SCORE;
 
   async function showJoinScreen() {
     const nameInput = document.getElementById('player-name');
@@ -1663,17 +1666,7 @@ const App = (() => {
       const conn = peer.connect('dekal' + code, { reliable: true });
       conn.on('open', () => {
         hostConn = conn;
-        conn.on('data', data => {
-          if (typeof handleClientMessage === 'function') handleClientMessage(data);
-          else {
-            // inline handler before Network is available
-            if (data.type === 'state') { gameState = data.state; const me = gameState.players?.find(p => p.name === myName && !p.isBot); if (me) { myPlayerId = me.id; myPeerId = me.id; } Render.fromState(); }
-            else if (data.type === 'pending') showWaitingApproval();
-            else if (data.type === 'approved') { hideWaitingApproval(); if (data.playerId) { myPlayerId = data.playerId; myPeerId = data.playerId; } }
-            else if (data.type === 'rejected') { hideWaitingApproval(); UI.toast('❌ ' + (data.msg || 'Accès refusé')); setTimeout(() => backToMenu(true), 1200); }
-            else if (data.type === 'toast') UI.toast(data.msg);
-          }
-        });
+        conn.on('data', data => _handleClientMsg(data));
         conn.on('close', () => { hostConn = null; Network.scheduleReconnect(); });
         conn.send({ type: 'join', name, id: myPeerId, lastId: myPeerId });
         UI.setConnStatus('connected', '');
@@ -1684,7 +1677,7 @@ const App = (() => {
     } catch(e) { UI.setConnStatus('', ''); UI.toast('Erreur : ' + e.message); }
   }
 
-  function handleClientMessage(data) { Network.handleClientMessage ? Network.handleClientMessage(data) : null; }
+
 
   async function checkRoomStatus(code) {
     if (!code || code.length !== 5) return;
