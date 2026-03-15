@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Dékal">
 <link rel="manifest" id="pwa-manifest">
-<title>Dékal Multijoueur v1.2.9</title>
+<title>Dékal Multijoueur v1.2.8</title>
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/davidshimjs-qrcodejs@0.0.2/qrcode.min.js"></script>
 <style>
@@ -33,7 +33,7 @@ input::placeholder{color:#888}
 
 /* ── CARDS ── */
 .card{
-  width:44px;height:62px;border-radius:7px;
+  width:46px;height:64px;border-radius:7px;
   display:flex;align-items:center;justify-content:center;
   font-size:1.15em;font-weight:900;cursor:pointer;
   transition:transform .15s,box-shadow .15s,opacity .2s;
@@ -82,7 +82,7 @@ input::placeholder{color:#888}
 
 
 /* ── PLAYER ZONES ── */
-.player-zone{background:rgba(255,255,255,.05);border-radius:10px;padding:6px;border:2px solid transparent;transition:border-color .2s,background .2s;width:fit-content;min-width:200px}
+.player-zone{background:rgba(255,255,255,.05);border-radius:10px;padding:6px;border:2px solid transparent;transition:border-color .2s,background .2s}
 .player-zone.pcolor-0{background:rgba(52,152,219,.08);border-color:rgba(52,152,219,.2)}
 .player-zone.pcolor-1{background:rgba(46,204,113,.08);border-color:rgba(46,204,113,.2)}
 .player-zone.pcolor-2{background:rgba(230,126,34,.08);border-color:rgba(230,126,34,.2)}
@@ -109,7 +109,7 @@ input::placeholder{color:#888}
 .center-cards-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;min-height:70px;align-items:center}
 
 /* ── PLAYERS AREA ── */
-.players-area{width:100%;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 6px 60px}
+.players-area{width:100%;max-width:700px;display:flex;flex-direction:column;gap:5px;padding:2px 6px;overflow-y:auto;flex:1;min-height:0;padding-bottom:50px}
 
 /* compact other players */
 .compact-list{display:flex;flex-direction:column;gap:6px;margin-top:4px;width:100%}
@@ -265,7 +265,7 @@ input::placeholder{color:#888}
   const blob=new Blob([JSON.stringify(m)],{type:'application/manifest+json'});
   document.getElementById('pwa-manifest').href=URL.createObjectURL(blob);
 })();
-if('serviceWorker' in navigator){const sw=`const C='dekal-v1.2.9';self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',()=>clients.claim());`;navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});}
+if('serviceWorker' in navigator){const sw=`const C='dekal-v1.2.8';self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',()=>clients.claim());`;navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});}
 </script>
 </head>
 <body>
@@ -274,7 +274,7 @@ if('serviceWorker' in navigator){const sw=`const C='dekal-v1.2.9';self.addEventL
 <div id="splash-screen">
   <div class="splash-title">DÉKAL</div>
   <div class="splash-cards" id="splash-cards"></div>
-  <div class="splash-sub">v1.2.9</div>
+  <div class="splash-sub">v1.2.8</div>
   <div class="splash-tagline">crédits : claude.ai · @Pneubis</div>
   <div class="splash-progress"><div class="splash-progress-bar"></div></div>
   <script>
@@ -315,7 +315,7 @@ if('serviceWorker' in navigator){const sw=`const C='dekal-v1.2.9';self.addEventL
 <!-- SCREEN: MENU -->
 <div class="screen active" id="screen-menu">
   <h1>DÉKAL</h1>
-  <p style="font-size:.85em;color:rgba(255,255,255,.65);letter-spacing:3px;margin:-4px 0 10px;font-weight:600">v1.2.9</p>
+  <p style="font-size:.85em;color:rgba(255,255,255,.65);letter-spacing:3px;margin:-4px 0 10px;font-weight:600">v1.2.8</p>
   <p class="subtitle" style="margin-top:0">
     <button onclick="UI.showRules()" style="background:none;border:1px solid rgba(255,255,255,.25);color:#aaa;font-size:.8em;font-weight:600;padding:3px 12px;border-radius:20px;cursor:pointer;min-height:auto">ⓘ Règles</button>
     <button onclick="UI.showScoreOptions()" id="score-target-btn" style="background:none;border:1px solid rgba(245,166,35,.4);color:rgba(245,166,35,.8);font-size:.8em;font-weight:600;padding:3px 12px;border-radius:20px;cursor:pointer;min-height:auto;margin-left:8px">🎯 Score max : 50</button>
@@ -398,21 +398,17 @@ if('serviceWorker' in navigator){const sw=`const C='dekal-v1.2.9';self.addEventL
 </div>
 
 <!-- SCREEN: GAME -->
-<div class="screen" id="screen-game" style="justify-content:flex-start;padding-top:0;height:100dvh;overflow:hidden;flex-direction:column;align-items:center">
-  <!-- Header fixe : infos de tour + cartes révélées -->
-  <div id="game-fixed-header" style="width:100%;max-width:700px;flex-shrink:0;background:#1a1a2e;z-index:10;padding:0 6px;">
-    <div class="game-header">
-      <div class="round-info" id="round-info">Tour 1 / 16</div>
-      <div class="game-header-top">
-        <button class="secondary" style="padding:6px 10px;font-size:.75em;min-height:36px;flex-shrink:0" onclick="UI.showRules()">?</button>
-        <div class="game-status" id="game-status">En attente...</div>
-        <div style="width:36px"></div>
-      </div>
+<div class="screen" id="screen-game" style="justify-content:flex-start;padding-top:0;height:100dvh;overflow:hidden;flex-direction:column">
+  <div class="game-header">
+    <div class="round-info" id="round-info">Tour 1 / 16</div>
+    <div class="game-header-top">
+      <button class="secondary" style="padding:6px 10px;font-size:.75em;min-height:36px;flex-shrink:0" onclick="UI.showRules()">?</button>
+      <div class="game-status" id="game-status">En attente...</div>
+      <div style="width:36px"></div>
     </div>
-    <div class="center-area" id="center-area" style="display:none"></div>
   </div>
-  <!-- Zone scrollable centrée : grilles des joueurs -->
   <div class="game-content" id="game-content">
+    <div class="center-area" id="center-area" style="display:none"></div>
     <div class="players-area" id="players-area"></div>
   </div>
   <div class="action-bar" id="action-bar"></div>
@@ -439,7 +435,7 @@ if('serviceWorker' in navigator){const sw=`const C='dekal-v1.2.9';self.addEventL
 <script>
 "use strict";
 // ============================================================
-// DÉKAL MULTIJOUEUR v1.2.9
+// DÉKAL MULTIJOUEUR v1.2.8
 //
 // RÈGLES EXACTES :
 // - 100 cartes Dékal numérotées
@@ -1446,7 +1442,7 @@ const Render = (() => {
     const grid = gameState.grids[pid];
     const validMoves = getValidPushMoves(grid);
     const has = (dir, idx) => validMoves.some(m => m.dir === dir && m.idx === idx);
-    const C = 44, CH = 62, G = 3, A = 24;
+    const C = 46, CH = 64, G = 3, A = 24;
 
     // CSS grid 6×6 :
     // col 1 = flèches row_right (→) | cols 2-5 = cartes | col 6 = flèches row_left (←)
