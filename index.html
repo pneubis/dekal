@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Dékal">
 <link rel="manifest" id="pwa-manifest">
-<title>Dékal Multijoueur</title>
+<title>Dékal Multijoueur v1.0.3</title>
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/davidshimjs-qrcodejs@0.0.2/qrcode.min.js"></script>
 <style>
@@ -253,7 +253,7 @@ input::placeholder{color:#888}
   const blob=new Blob([JSON.stringify(m)],{type:'application/manifest+json'});
   document.getElementById('pwa-manifest').href=URL.createObjectURL(blob);
 })();
-if('serviceWorker' in navigator){const sw=`const C='dekal-v1';self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',()=>clients.claim());`;navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});}
+if('serviceWorker' in navigator){const sw=`const C='dekal-v1.0.3';self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',()=>clients.claim());`;navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});}
 </script>
 </head>
 <body>
@@ -261,7 +261,7 @@ if('serviceWorker' in navigator){const sw=`const C='dekal-v1';self.addEventListe
 <!-- SPLASH -->
 <div id="splash-screen">
   <div class="splash-title">DÉKAL</div>
-  <div class="splash-sub">v1.0.0</div>
+  <div class="splash-sub">v1.0.3</div>
   <div class="splash-tagline">crédits : claude.ai · @Pneubis</div>
   <div class="splash-progress"><div class="splash-progress-bar"></div></div>
 </div>
@@ -287,7 +287,7 @@ if('serviceWorker' in navigator){const sw=`const C='dekal-v1';self.addEventListe
 <!-- SCREEN: MENU -->
 <div class="screen active" id="screen-menu">
   <h1>DÉKAL</h1>
-  <p style="font-size:.85em;color:rgba(255,255,255,.65);letter-spacing:3px;margin:-4px 0 10px;font-weight:600">v1.0.0</p>
+  <p style="font-size:.85em;color:rgba(255,255,255,.65);letter-spacing:3px;margin:-4px 0 10px;font-weight:600">v1.0.3</p>
   <p class="subtitle" style="margin-top:0">
     <button onclick="UI.showRules()" style="background:none;border:1px solid rgba(255,255,255,.25);color:#aaa;font-size:.8em;font-weight:600;padding:3px 12px;border-radius:20px;cursor:pointer;min-height:auto">ⓘ Règles</button>
   </p>
@@ -404,7 +404,7 @@ if('serviceWorker' in navigator){const sw=`const C='dekal-v1';self.addEventListe
 <script>
 "use strict";
 // ============================================================
-// DÉKAL MULTIJOUEUR v1.0
+// DÉKAL MULTIJOUEUR v1.0.3
 //
 // RÈGLES EXACTES :
 // - 100 cartes Dékal numérotées
@@ -1271,7 +1271,8 @@ const Render = (() => {
       html += '</div>';
     }
 
-    if (playersArea.dataset.last !== html) { playersArea.dataset.last = html; playersArea.innerHTML = html; }
+    // Toujours re-rendre (pas de cache sur playersArea pour ne pas bloquer les updates du bot)
+    playersArea.innerHTML = html;
 
     // Action bar — show confirm if card chosen and waiting
     let barHtml = '';
@@ -1401,18 +1402,15 @@ const App = (() => {
   async function createSoloGame() {
     const name = document.getElementById('player-name').value.trim() || 'Joueur';
     myName = name;
-    try {
-      UI.setConnStatus('connecting', '📡 Connexion...');
-      roomCode = Network.generateRoomCode();
-      await Network.initPeer('dekal' + roomCode);
-      Network.setupHostListeners();
-      isHost = true; myPlayerId = myPeerId;
-      gameState = _makeInitialState(name, true, _botDifficulty);
-      try { localStorage.setItem('dekal_activeRoom', roomCode); } catch(e) {}
-      UI.setConnStatus('connected', '');
-      Render.fromState();
-      updateDiffButtons();
-    } catch(e) { UI.setConnStatus('', ''); UI.toast('Erreur : ' + e.message); }
+    // Solo : pas de réseau, tout est local
+    isHost = true;
+    myPeerId = 'solo-host';
+    myPlayerId = 'solo-host';
+    roomCode = 'SOLO1';
+    gameState = _makeInitialState(name, true, _botDifficulty);
+    UI.setConnStatus('', '');
+    Render.fromState();
+    updateDiffButtons();
   }
 
   async function createGame() {
@@ -1495,8 +1493,10 @@ const App = (() => {
   }
 
   function leaveLobby() {
-    try { if (peer) peer.destroy(); } catch(e) {}
-    try { localStorage.removeItem('dekal_activeRoom'); } catch(e) {}
+    if (!gameState?.isSolo) {
+      try { if (peer) peer.destroy(); } catch(e) {}
+      try { localStorage.removeItem('dekal_activeRoom'); } catch(e) {}
+    }
     peer = null; connections = {}; hostConn = null; isHost = false; gameState = null; roomCode = ''; myPlayerId = ''; myPeerId = '';
     UI.setConnStatus('', ''); UI.showScreen('screen-menu');
   }
@@ -1504,8 +1504,10 @@ const App = (() => {
   function backToMenu(clearState) {
     Bot.clearTimers();
     if (clearState) {
-      try { if (peer) peer.destroy(); } catch(e) {}
-      try { localStorage.removeItem('dekal_activeRoom'); } catch(e) {}
+      if (!gameState?.isSolo) {
+        try { if (peer) peer.destroy(); } catch(e) {}
+        try { localStorage.removeItem('dekal_activeRoom'); } catch(e) {}
+      }
       peer = null; connections = {}; hostConn = null; isHost = false; gameState = null; roomCode = ''; myPlayerId = ''; myPeerId = '';
     }
     UI.setConnStatus('', ''); UI.showScreen('screen-menu');
