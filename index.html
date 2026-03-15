@@ -13,16 +13,13 @@
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/davidshimjs-qrcodejs@0.0.2/qrcode.min.js"></script>
 <style>
-/* ============================================================
-   STYLES — DÉKAL MULTIJOUEUR
-   ============================================================ */
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#1a1a2e;color:#fff;min-height:100vh;min-height:100dvh;overflow-x:hidden;user-select:none}
 .screen{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:16px}
 .screen.active{display:flex}
 h1{font-size:2.2em;font-weight:700;margin-bottom:8px;background:linear-gradient(135deg,#e94560,#f5a623);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 h2{font-size:1.4em;font-weight:600;margin-bottom:16px;color:#ddd}
-.subtitle{color:#aaa;font-size:0.9em;margin-bottom:24px}
+.subtitle{color:#aaa;font-size:.9em;margin-bottom:24px}
 button{background:linear-gradient(135deg,#e94560,#c0392b);color:#fff;border:none;padding:14px 32px;border-radius:12px;font-size:1em;font-weight:600;cursor:pointer;transition:all .2s;touch-action:manipulation;min-height:48px}
 button:hover{transform:translateY(-2px);box-shadow:0 4px 15px rgba(233,69,96,.4)}
 button:active{transform:translateY(0)}
@@ -36,140 +33,179 @@ input::placeholder{color:#888}
 
 /* ── CARDS ── */
 .card{
-  width:62px;height:86px;border-radius:9px;
+  width:52px;height:52px;border-radius:8px;
   display:flex;align-items:center;justify-content:center;
-  font-size:1.35em;font-weight:900;cursor:pointer;
-  transition:transform .2s,box-shadow .2s,opacity .2s;
-  position:relative;border:2px solid rgba(255,255,255,.18);
-  letter-spacing:-1px;-webkit-font-smoothing:antialiased;
-  flex-shrink:0;
+  font-size:1.3em;font-weight:900;cursor:pointer;
+  transition:transform .15s,box-shadow .15s,opacity .2s;
+  position:relative;border:2px solid rgba(255,255,255,.15);
+  flex-shrink:0;-webkit-font-smoothing:antialiased;
+  background:#2a2a4a;color:#fff;
 }
-.card:active{transform:scale(.95)}
+.card:active{transform:scale(.93)}
 .card.face-down{
-  background-image:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 72'><defs><linearGradient id='bg' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' style='stop-color:%23c0392b'/><stop offset='100%25' style='stop-color:%23922b21'/></linearGradient></defs><rect width='52' height='72' rx='5' fill='url(%23bg)'/><rect x='2.5' y='2.5' width='47' height='67' rx='4' fill='none' stroke='rgba(255,255,255,0.25)' stroke-width='1'/><text x='26' y='42' text-anchor='middle' font-family='Arial Black' font-size='11' font-weight='900' fill='rgba(255,255,255,0.3)' letter-spacing='1'>DÉKAL</text></svg>");
-  background-size:cover;color:transparent;cursor:pointer;border-color:rgba(200,60,40,0.5);
+  background:linear-gradient(135deg,#c0392b,#922b21);
+  color:transparent;cursor:pointer;
+  border-color:rgba(200,60,40,.5);
 }
-.card.eliminated{opacity:0;pointer-events:none;transform:scale(0)}
-.card.selectable{animation:pulse 1.2s infinite;box-shadow:0 0 10px rgba(233,69,96,.6)}
-.card.highlight{box-shadow:0 0 16px rgba(255,255,255,.5)}
-.card.selected-src{box-shadow:0 0 20px rgba(245,166,35,.9);border-color:#f5a623;transform:translateY(-6px)}
-@keyframes pulse{0%,100%{box-shadow:0 0 8px rgba(233,69,96,.4)}50%{box-shadow:0 0 20px rgba(233,69,96,.9)}}
+.card.face-down::after{content:'🂠';color:rgba(255,255,255,.15);font-size:1.4em;position:absolute}
+.card.selectable{animation:cardPulse 1s infinite;cursor:pointer}
+@keyframes cardPulse{0%,100%{box-shadow:0 0 0 2px rgba(245,166,35,.4)}50%{box-shadow:0 0 0 4px rgba(245,166,35,.9),0 0 14px rgba(245,166,35,.4)}}
+.card.selected{box-shadow:0 0 0 3px #f5a623,0 0 16px rgba(245,166,35,.6);transform:translateY(-4px);background:#3a3a0a;border-color:#f5a623}
+.card.annulled{opacity:0;transform:scale(0);pointer-events:none;transition:all .4s}
+.card.highlight-push{box-shadow:0 0 0 3px #2ecc71,0 0 14px rgba(46,204,113,.5)}
+.card.center-choice{box-shadow:0 0 0 3px #3498db,0 0 14px rgba(52,152,219,.5);cursor:pointer;animation:centerPulse 1s infinite}
+@keyframes centerPulse{0%,100%{box-shadow:0 0 0 2px rgba(52,152,219,.5)}50%{box-shadow:0 0 0 4px rgba(52,152,219,1),0 0 14px rgba(52,152,219,.4)}}
 
-/* Card flip */
-@keyframes cardFlip{0%{transform:rotateY(0deg)}50%{transform:rotateY(90deg)}100%{transform:rotateY(0deg)}}
-.card.flipping{animation:cardFlip .22s ease-in-out}
+/* card value colors */
+.cv-low {background:linear-gradient(135deg,#1a6b3a,#27ae60);border-color:rgba(46,204,113,.4)}  /* 1-3 */
+.cv-mid {background:linear-gradient(135deg,#1a4a8a,#2980b9);border-color:rgba(52,152,219,.4)}  /* 4-6 */
+.cv-high{background:linear-gradient(135deg,#7d3c98,#9b59b6);border-color:rgba(155,89,182,.4)}  /* 7-9 */
+.cv-top {background:linear-gradient(135deg,#922b21,#e74c3c);border-color:rgba(231,76,60,.4)}   /* 10+ */
+.cv-zero{background:linear-gradient(135deg,#1a1a2e,#2c2c4e);border-color:rgba(255,255,255,.1)} /* 0 */
 
-/* Card colors by suit */
-.suit-hearts  {background:linear-gradient(160deg,#e74c3c,#c0392b);color:#fff;border-color:rgba(255,180,160,.35)}
-.suit-diamonds{background:linear-gradient(160deg,#e67e22,#d35400);color:#fff;border-color:rgba(255,200,130,.35)}
-.suit-clubs   {background:linear-gradient(160deg,#2c3e50,#1a252f);color:#ddd;border-color:rgba(255,255,255,.25)}
-.suit-spades  {background:linear-gradient(160deg,#1a1a2e,#0f0f1f);color:#ddd;border-color:rgba(255,255,255,.25)}
-.suit-joker   {background:linear-gradient(160deg,#8e44ad,#6c3483);color:#ffe4ff;border-color:rgba(200,150,255,.5)}
+/* ── GRID ── */
+.grid-wrap{display:inline-flex;flex-direction:column;gap:4px;padding:6px;border-radius:10px;background:rgba(255,255,255,.04)}
+.grid-row{display:flex;gap:4px}
 
-/* Rank value colors */
-.rank-high {filter:brightness(1.15)}
-.rank-low  {filter:brightness(.85)}
-
-/* ── CARD SLOTS (zones de dépôt) ── */
-.slot{
-  width:62px;height:86px;border-radius:9px;
-  border:2px dashed rgba(255,255,255,.15);
-  display:inline-flex;align-items:center;justify-content:center;
-  font-size:.65em;color:rgba(255,255,255,.2);
-  cursor:pointer;transition:all .2s;flex-shrink:0;
+/* push arrows around grid */
+.push-ui{display:grid;gap:4px}
+.push-ui .push-row{display:flex;gap:4px;align-items:center;justify-content:center}
+.push-btn{
+  width:28px;height:52px;border-radius:6px;border:none;background:rgba(46,204,113,.15);
+  border:1.5px solid rgba(46,204,113,.35);color:#2ecc71;font-size:1em;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;min-height:auto;padding:0;
+  transition:all .2s;flex-shrink:0;
 }
-.slot.drop-target{border-color:#f5a623;background:rgba(245,166,35,.1);color:#f5a623;animation:slotPulse 1s infinite}
-@keyframes slotPulse{0%,100%{border-color:rgba(245,166,35,.6)}50%{border-color:rgba(245,166,35,1);box-shadow:0 0 12px rgba(245,166,35,.4)}}
+.push-btn:hover{background:rgba(46,204,113,.3);border-color:#2ecc71;transform:none;box-shadow:0 0 8px rgba(46,204,113,.4)}
+.push-btn.col-btn{width:52px;height:28px}
+.push-btn:disabled{opacity:.2;cursor:not-allowed}
 
 /* ── PLAYER ZONES ── */
 .player-zone{background:rgba(255,255,255,.05);border-radius:12px;padding:10px;border:2px solid transparent;transition:border-color .2s,background .2s}
-.player-zone.pcolor-0{background:rgba(52,152,219,.10);border-color:rgba(52,152,219,.25)}
-.player-zone.pcolor-1{background:rgba(46,204,113,.10);border-color:rgba(46,204,113,.25)}
-.player-zone.pcolor-2{background:rgba(230,126,34,.10);border-color:rgba(230,126,34,.25)}
-.player-zone.pcolor-3{background:rgba(155,89,182,.10);border-color:rgba(155,89,182,.25)}
-.player-zone.pcolor-4{background:rgba(231,76,60,.10);border-color:rgba(231,76,60,.25)}
-.player-zone.pcolor-5{background:rgba(241,196,15,.10);border-color:rgba(241,196,15,.25)}
-.player-zone.pcolor-6{background:rgba(26,188,156,.10);border-color:rgba(26,188,156,.25)}
-.player-zone.pcolor-7{background:rgba(236,112,99,.10);border-color:rgba(236,112,99,.25)}
-.player-zone.pcolor-0.current-turn{background:rgba(52,152,219,.22);border-color:rgba(52,152,219,.7);box-shadow:0 0 16px rgba(52,152,219,.3)}
-.player-zone.pcolor-1.current-turn{background:rgba(46,204,113,.22);border-color:rgba(46,204,113,.7);box-shadow:0 0 16px rgba(46,204,113,.3)}
-.player-zone.pcolor-2.current-turn{background:rgba(230,126,34,.22);border-color:rgba(230,126,34,.7);box-shadow:0 0 16px rgba(230,126,34,.3)}
-.player-zone.pcolor-3.current-turn{background:rgba(155,89,182,.22);border-color:rgba(155,89,182,.7);box-shadow:0 0 16px rgba(155,89,182,.3)}
-.player-zone.pcolor-4.current-turn{background:rgba(231,76,60,.22);border-color:rgba(231,76,60,.7);box-shadow:0 0 16px rgba(231,76,60,.3)}
-.player-zone.pcolor-5.current-turn{background:rgba(241,196,15,.22);border-color:rgba(241,196,15,.7);box-shadow:0 0 16px rgba(241,196,15,.3)}
-.player-zone.pcolor-6.current-turn{background:rgba(26,188,156,.22);border-color:rgba(26,188,156,.7);box-shadow:0 0 16px rgba(26,188,156,.3)}
-.player-zone.pcolor-7.current-turn{background:rgba(236,112,99,.22);border-color:rgba(236,112,99,.7);box-shadow:0 0 16px rgba(236,112,99,.3)}
-.player-zone.is-me.current-turn{animation:myTurnPulse 2s ease-in-out infinite}
-@keyframes myTurnPulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.18)}}
+.player-zone.pcolor-0{background:rgba(52,152,219,.08);border-color:rgba(52,152,219,.2)}
+.player-zone.pcolor-1{background:rgba(46,204,113,.08);border-color:rgba(46,204,113,.2)}
+.player-zone.pcolor-2{background:rgba(230,126,34,.08);border-color:rgba(230,126,34,.2)}
+.player-zone.pcolor-3{background:rgba(155,89,182,.08);border-color:rgba(155,89,182,.2)}
+.player-zone.pcolor-4{background:rgba(231,76,60,.08);border-color:rgba(231,76,60,.2)}
+.player-zone.pcolor-5{background:rgba(241,196,15,.08);border-color:rgba(241,196,15,.2)}
+.player-zone.pcolor-0.dekal-turn{background:rgba(52,152,219,.2);border-color:rgba(52,152,219,.8);box-shadow:0 0 18px rgba(52,152,219,.3)}
+.player-zone.pcolor-1.dekal-turn{background:rgba(46,204,113,.2);border-color:rgba(46,204,113,.8);box-shadow:0 0 18px rgba(46,204,113,.3)}
+.player-zone.pcolor-2.dekal-turn{background:rgba(230,126,34,.2);border-color:rgba(230,126,34,.8);box-shadow:0 0 18px rgba(230,126,34,.3)}
+.player-zone.pcolor-3.dekal-turn{background:rgba(155,89,182,.2);border-color:rgba(155,89,182,.8);box-shadow:0 0 18px rgba(155,89,182,.3)}
+.player-zone.pcolor-4.dekal-turn{background:rgba(231,76,60,.2);border-color:rgba(231,76,60,.8);box-shadow:0 0 18px rgba(231,76,60,.3)}
+.player-zone.pcolor-5.dekal-turn{background:rgba(241,196,15,.2);border-color:rgba(241,196,15,.8);box-shadow:0 0 18px rgba(241,196,15,.3)}
+.player-zone.is-me.dekal-turn{animation:myTurnPulse 2s ease-in-out infinite}
+@keyframes myTurnPulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.15)}}
 
-.player-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding:0 4px}
-.player-name{font-weight:600;font-size:.9em}
-.player-score{font-size:.85em;color:#aaa}
-.turn-indicator{font-size:.7em;color:#f5a623;font-weight:600}
+.player-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding:0 2px}
+.player-name-label{font-weight:600;font-size:.85em}
+.player-score-label{font-size:.78em;color:#aaa}
+.dekal-pion{font-size:.9em;margin-left:4px;filter:drop-shadow(0 0 4px #f5a623)}
 
-/* ── HAND AREA ── */
-.hand-area{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;align-items:flex-end;min-height:96px;padding:4px}
-.row-label{font-size:.62em;color:#aaa;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;text-align:center}
-
-/* ── DRAW/DISCARD PILES ── */
-.piles{display:flex;gap:14px;align-items:center;justify-content:center;margin:4px 0;flex-shrink:0}
-.pile{display:flex;flex-direction:column;align-items:center;gap:3px}
-.pile-label{font-size:.62em;color:#aaa;text-transform:uppercase;letter-spacing:.5px}
-.pile .card{width:56px;height:78px;font-size:1.2em}
+/* ── CENTER AREA ── */
+.center-area{background:rgba(255,255,255,.04);border-radius:14px;padding:12px 16px;margin:6px 0;width:100%;max-width:700px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.center-title{font-size:.72em;color:#aaa;text-transform:uppercase;letter-spacing:1px;font-weight:600}
+.center-cards-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;min-height:60px;align-items:center}
 
 /* ── PLAYERS AREA ── */
-.players-area{width:100%;max-width:700px;display:flex;flex-direction:column;gap:8px;padding:4px 8px;overflow-y:auto;flex:1;min-height:0;padding-bottom:60px}
+.players-area{width:100%;max-width:700px;display:flex;flex-direction:column;gap:8px;padding:4px 8px;overflow-y:auto;flex:1;min-height:0;padding-bottom:70px}
 
-/* ── COMPACT PLAYERS (3+) ── */
-.compact-players-list{width:100%;display:flex;flex-direction:column;gap:6px;margin-top:4px}
-.compact-player-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,.05);border:2px solid transparent;transition:all .25s}
-.compact-player-row.pcolor-0{background:rgba(52,152,219,.08);border-color:rgba(52,152,219,.2)}
-.compact-player-row.pcolor-1{background:rgba(46,204,113,.08);border-color:rgba(46,204,113,.2)}
-.compact-player-row.pcolor-2{background:rgba(230,126,34,.08);border-color:rgba(230,126,34,.2)}
-.compact-player-row.pcolor-3{background:rgba(155,89,182,.08);border-color:rgba(155,89,182,.2)}
-.compact-player-row.pcolor-4{background:rgba(231,76,60,.08);border-color:rgba(231,76,60,.2)}
-.compact-player-row.pcolor-5{background:rgba(241,196,15,.08);border-color:rgba(241,196,15,.2)}
-.compact-player-row.pcolor-6{background:rgba(26,188,156,.08);border-color:rgba(26,188,156,.2)}
-.compact-player-row.pcolor-7{background:rgba(236,112,99,.08);border-color:rgba(236,112,99,.2)}
-.compact-player-row.current-turn.pcolor-0{background:rgba(52,152,219,.2);border-color:rgba(52,152,219,.7)}
-.compact-player-row.current-turn.pcolor-1{background:rgba(46,204,113,.2);border-color:rgba(46,204,113,.7)}
-.compact-player-row.current-turn.pcolor-2{background:rgba(230,126,34,.2);border-color:rgba(230,126,34,.7)}
-.compact-player-row.current-turn.pcolor-3{background:rgba(155,89,182,.2);border-color:rgba(155,89,182,.7)}
-.compact-player-row.current-turn.pcolor-4{background:rgba(231,76,60,.2);border-color:rgba(231,76,60,.7)}
-.compact-player-row.current-turn.pcolor-5{background:rgba(241,196,15,.2);border-color:rgba(241,196,15,.7)}
-.compact-player-row.current-turn.pcolor-6{background:rgba(26,188,156,.2);border-color:rgba(26,188,156,.7)}
-.compact-player-row.current-turn.pcolor-7{background:rgba(236,112,99,.2);border-color:rgba(236,112,99,.7)}
-.compact-player-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.95em;color:#fff;flex-shrink:0}
-.pcolor-0 .compact-player-avatar{background:rgba(52,152,219,.6)}
-.pcolor-1 .compact-player-avatar{background:rgba(46,204,113,.6)}
-.pcolor-2 .compact-player-avatar{background:rgba(230,126,34,.6)}
-.pcolor-3 .compact-player-avatar{background:rgba(155,89,182,.6)}
-.pcolor-4 .compact-player-avatar{background:rgba(231,76,60,.6)}
-.pcolor-5 .compact-player-avatar{background:rgba(241,196,15,.6)}
-.pcolor-6 .compact-player-avatar{background:rgba(26,188,156,.6)}
-.pcolor-7 .compact-player-avatar{background:rgba(236,112,99,.6)}
-.compact-player-info{flex:1;min-width:0}
-.compact-player-name{font-weight:600;font-size:.88em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.compact-player-scores{font-size:.74em;color:#aaa;margin-top:1px}
-.compact-player-scores strong{color:#f5a623}
-.compact-turn-dot{width:8px;height:8px;border-radius:50%;background:#f5a623;flex-shrink:0;box-shadow:0 0 6px rgba(245,166,35,.8);animation:turnDotPulse 1s ease-in-out infinite}
-@keyframes turnDotPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
-.compact-mini-cards{display:flex;gap:3px;flex-shrink:0}
-.compact-mini-card{width:14px;height:20px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:.5em;font-weight:900;color:#fff;border:1px solid rgba(255,255,255,.15)}
-.compact-mini-card.face-down{background:#922b21;color:transparent}
-.player-badge{font-size:.7em;padding:2px 8px;border-radius:20px;background:rgba(233,69,96,.3);color:#f5a623}
+/* compact other players */
+.compact-list{display:flex;flex-direction:column;gap:6px;margin-top:4px;width:100%}
+.compact-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,.05);border:2px solid transparent}
+.compact-row.pcolor-0{background:rgba(52,152,219,.06);border-color:rgba(52,152,219,.18)}
+.compact-row.pcolor-1{background:rgba(46,204,113,.06);border-color:rgba(46,204,113,.18)}
+.compact-row.pcolor-2{background:rgba(230,126,34,.06);border-color:rgba(230,126,34,.18)}
+.compact-row.pcolor-3{background:rgba(155,89,182,.06);border-color:rgba(155,89,182,.18)}
+.compact-row.pcolor-4{background:rgba(231,76,60,.06);border-color:rgba(231,76,60,.18)}
+.compact-row.pcolor-5{background:rgba(241,196,15,.06);border-color:rgba(241,196,15,.18)}
+.compact-row.dekal-turn{border-color:rgba(245,166,35,.7) !important}
+.compact-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.9em;flex-shrink:0}
+.pcolor-0 .compact-avatar{background:rgba(52,152,219,.5)}
+.pcolor-1 .compact-avatar{background:rgba(46,204,113,.5)}
+.pcolor-2 .compact-avatar{background:rgba(230,126,34,.5)}
+.pcolor-3 .compact-avatar{background:rgba(155,89,182,.5)}
+.pcolor-4 .compact-avatar{background:rgba(231,76,60,.5)}
+.pcolor-5 .compact-avatar{background:rgba(241,196,15,.5)}
+.compact-info{flex:1;min-width:0}
+.compact-name{font-weight:600;font-size:.85em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.compact-detail{font-size:.72em;color:#aaa;margin-top:1px}
+.compact-mini-grid{display:grid;grid-template-columns:repeat(4,16px);gap:2px;flex-shrink:0}
+.mini-cell{width:16px;height:16px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:.5em;font-weight:700;border:1px solid rgba(255,255,255,.1)}
+.mini-cell.face-down{background:#922b21;color:transparent}
 
-/* ── KICK / DISCONNECT ── */
-.kick-in-game-btn{background:rgba(231,76,60,.15);border:1px solid rgba(231,76,60,.4);color:#e74c3c;font-size:.65em;padding:3px 8px;border-radius:8px;cursor:pointer;min-height:auto;font-weight:600;transition:all .2s;margin-left:6px;vertical-align:middle}
-.kick-in-game-btn:hover{background:rgba(231,76,60,.35);border-color:#e74c3c;transform:none;box-shadow:none}
-.kick-btn{background:rgba(231,76,60,.15);border:1px solid rgba(231,76,60,.4);color:#e74c3c;font-size:.7em;padding:4px 10px;border-radius:8px;cursor:pointer;min-height:auto;font-weight:600;transition:all .2s}
-.reconnecting-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(231,76,60,.15);border:1px solid rgba(231,76,60,.4);border-radius:8px;padding:3px 10px;font-size:.7em;color:#e74c3c;animation:reconnectBlink 1.2s ease-in-out infinite}
-@keyframes reconnectBlink{0%,100%{opacity:1}50%{opacity:.4}}
+/* ── GAME HEADER ── */
+.game-header{width:100%;max-width:700px;display:flex;flex-direction:column;align-items:center;padding:calc(3px + env(safe-area-inset-top,0px)) 10px 4px;background:rgba(255,255,255,.05);border-radius:10px;margin-bottom:4px;gap:2px;flex-shrink:0}
+.game-header-top{width:100%;display:flex;justify-content:space-between;align-items:center}
+.game-status{font-size:.78em;color:#ddd;text-align:center;flex:1;line-height:1.3}
+.round-info{font-size:.7em;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:1.5px;text-align:left;text-transform:uppercase;padding-left:8px;width:100%}
+
+/* ── ACTION BAR ── */
+.action-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(18,18,26,.97);backdrop-filter:blur(14px);padding:10px 14px;border-top:1px solid rgba(255,255,255,.1);z-index:100;display:none}
+.action-bar button{padding:10px 18px;font-size:.85em}
+
+/* ── SCORES ── */
+.scores-table{width:100%;max-width:420px;border-collapse:collapse;margin:12px 0}
+.scores-table th{color:#aaa;font-weight:600;font-size:.75em;text-transform:uppercase;letter-spacing:.8px;padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.08)}
+.scores-table td{padding:10px;text-align:center;border-bottom:1px solid rgba(255,255,255,.06);font-size:.92em}
+.scores-table td:first-child{text-align:left;padding-left:14px}
+.scores-table tr.winner td{background:rgba(46,204,113,.1)}
+.scores-table tr.winner td:first-child{border-left:3px solid #2ecc71}
+.scores-table td.total{font-weight:700;color:#f5a623;font-size:1.05em}
+.score-cards{width:100%;max-width:420px;display:flex;flex-direction:column;gap:8px;margin:12px 0}
+.score-card{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07)}
+.score-card.rank-1{background:rgba(241,196,15,.08);border-color:rgba(241,196,15,.25)}
+.score-card.rank-2{background:rgba(192,192,192,.06);border-color:rgba(192,192,192,.18)}
+.score-card.rank-3{background:rgba(205,127,50,.06);border-color:rgba(205,127,50,.18)}
+.score-card-medal{font-size:1.6em;width:36px;text-align:center;flex-shrink:0}
+.score-card-name{flex:1;font-weight:600;font-size:.95em}
+.score-card-name small{display:block;color:#aaa;font-size:.75em;font-weight:400}
+.score-card-pts{font-weight:800;font-size:1.2em;color:#f5a623}
+.winner-banner{text-align:center;margin:8px 0 4px;padding:14px 16px;background:rgba(241,196,15,.08);border-radius:16px;border:1px solid rgba(241,196,15,.2)}
+.winner-name{font-size:1.1em;font-weight:700;color:#f5a623}
+.score-screen-content{width:100%;max-width:500px;display:flex;flex-direction:column;align-items:center;flex:1;overflow-y:auto;padding:0 16px 80px}
+
+/* ── OVERLAYS ── */
+#conn-status{position:fixed;top:0;left:0;right:0;z-index:9999;display:flex;flex-direction:column;pointer-events:none}
+#conn-status-text{display:none;text-align:center;font-size:.72em;padding:4px 8px;font-weight:600}
+#conn-status.connecting #conn-status-text,#conn-status.reconnecting #conn-status-text{display:block;background:rgba(230,126,34,.9);color:#fff}
+#conn-status-bar{height:3px;background:transparent;width:0;transition:width .3s}
+#conn-status.connecting #conn-status-bar{background:#e67e22}
+#conn-status.reconnecting #conn-status-bar{background:#e74c3c}
+#conn-status.connected #conn-status-bar{background:#2ecc71;width:100%!important}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(0,0,0,.85);color:#fff;padding:10px 20px;border-radius:24px;font-size:.9em;opacity:0;pointer-events:none;z-index:200;transition:opacity .3s,transform .3s;white-space:nowrap;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#fullscreen-btn{position:fixed;top:calc(6px + env(safe-area-inset-top,0px));right:max(10px,env(safe-area-inset-right,0px));z-index:500;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.2);color:#fff;width:36px;height:36px;border-radius:50%;display:none;align-items:center;justify-content:center;font-size:1em;padding:0;min-height:auto;cursor:pointer;backdrop-filter:blur(6px)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:none;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.active{display:flex}
+.modal{background:#1e1e2e;border-radius:16px;padding:24px;max-width:400px;width:100%;border:1px solid rgba(255,255,255,.1)}
+.modal h3{margin-bottom:12px;font-size:1.1em}
+.modal p{font-size:.9em;color:#bbb;margin-bottom:20px;max-height:55vh;overflow-y:auto;line-height:1.6}
+.modal .btn-group{margin-top:0;flex-direction:column}
+.modal .btn-group button{width:100%}
+#notif-banner{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(30,30,50,.95);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:8px;z-index:300;font-size:.82em;opacity:0;pointer-events:none;transition:opacity .3s;white-space:nowrap}
+#notif-banner.show{opacity:1;pointer-events:auto}
+#notif-banner button{padding:6px 12px;min-height:auto;font-size:.8em}
+.boom-overlay{position:fixed;inset:0;pointer-events:none;z-index:400;overflow:hidden}
+.boom-particle{position:absolute;border-radius:3px;animation:boomFly .6s ease-out forwards}
+@keyframes boomFly{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(0)}}
+.boom-text{position:absolute;left:50%;top:45%;transform:translate(-50%,-50%);font-size:2em;font-weight:900;color:#fff;text-shadow:0 0 20px rgba(255,200,0,.8);animation:boomText .8s ease-out forwards}
+@keyframes boomText{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}30%{opacity:1;transform:translate(-50%,-50%) scale(1.3)}100%{opacity:0;transform:translate(-50%,-60%) scale(1)}}
+
+/* ── SPLASH ── */
+#splash-screen{position:fixed;inset:0;background:#1a1a2e;z-index:9998;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .8s}
+#splash-screen.fade-out{opacity:0;pointer-events:none}
+.splash-title{font-size:3.5em;font-weight:900;background:linear-gradient(135deg,#e94560,#f5a623);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:8px;margin-bottom:12px;text-align:center}
+.splash-sub{font-size:.75em;color:rgba(255,255,255,.4);letter-spacing:3px;margin-bottom:4px;text-align:center}
+.splash-tagline{font-size:.62em;color:rgba(255,255,255,.25);text-align:center}
+.splash-progress{width:200px;height:3px;background:rgba(255,255,255,.1);border-radius:2px;margin-top:28px;overflow:hidden}
+.splash-progress-bar{height:100%;background:linear-gradient(90deg,#e94560,#f5a623);animation:splashLoad 4s ease-in-out forwards}
+@keyframes splashLoad{0%{width:0}100%{width:100%}}
 
 /* ── LOBBY ── */
 #resume-game-banner{width:100%;max-width:320px;background:linear-gradient(135deg,rgba(233,69,96,.18),rgba(245,166,35,.18));border:1.5px solid rgba(233,69,96,.55);border-radius:12px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;animation:resumePulse 2.5s ease-in-out infinite}
 @keyframes resumePulse{0%,100%{border-color:rgba(233,69,96,.55)}50%{border-color:rgba(233,69,96,.95);box-shadow:0 0 14px rgba(233,69,96,.3)}}
-#resume-game-banner .resume-info{flex:1;min-width:0}
+#resume-game-banner .resume-info{flex:1}
 #resume-game-banner .resume-label{font-size:.7em;color:#aaa;text-transform:uppercase;letter-spacing:.8px;font-weight:600}
 #resume-game-banner .resume-code{font-size:1.1em;font-weight:800;color:#e94560;letter-spacing:3px;font-family:monospace}
 #resume-game-banner .resume-btn{background:linear-gradient(135deg,#e94560,#f5a623);color:#fff;border:none;padding:9px 16px;border-radius:10px;font-size:.85em;font-weight:700;cursor:pointer;white-space:nowrap;min-height:auto;touch-action:manipulation}
@@ -181,90 +217,14 @@ input::placeholder{color:#888}
 #qr-container{margin:16px auto;border-radius:12px;background:#fff;padding:8px;display:inline-block}
 .room-code{font-family:monospace;font-size:1.8em;letter-spacing:4px;color:#f5a623;margin:8px 0}
 .copy-btn{font-size:.8em;padding:8px 16px;margin-top:4px}
-
-/* ── GAME HEADER ── */
-.game-header{width:100%;max-width:700px;display:flex;flex-direction:column;align-items:center;padding:calc(3px + env(safe-area-inset-top,0px)) 10px 4px;background:rgba(255,255,255,.05);border-radius:10px;margin-bottom:4px;gap:2px;flex-shrink:0}
-.game-header-top{width:100%;display:flex;justify-content:space-between;align-items:center}
-.game-status{font-size:.78em;color:#ddd;text-align:center;flex:1;line-height:1.2}
-.round-info{font-size:.7em;font-weight:700;color:rgba(255,255,255,.55);letter-spacing:1.5px;text-align:left;text-transform:uppercase;padding-left:max(8px,env(safe-area-inset-left,0px));width:100%}
-
-/* ── ACTION BAR ── */
-.action-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(18,18,26,.97);backdrop-filter:blur(14px);padding:10px 14px;border-top:1px solid rgba(255,255,255,.1);z-index:100}
-.action-bar button{padding:10px 20px;font-size:.85em}
-
-/* ── SCORES ── */
-.scores-table{width:100%;max-width:420px;border-collapse:collapse;margin:12px 0}
-.scores-table th{color:#aaa;font-weight:600;font-size:.75em;text-transform:uppercase;letter-spacing:.8px;padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.08)}
-.scores-table td{padding:11px 10px;text-align:center;border-bottom:1px solid rgba(255,255,255,.06);font-size:.95em}
-.scores-table td:first-child{text-align:left;padding-left:14px}
-.scores-table tr.winner td{background:rgba(46,204,113,.1)}
-.scores-table tr.winner td:first-child{border-left:3px solid #2ecc71}
-.scores-table td.total{font-weight:700;color:#f5a623;font-size:1.05em}
-.score-cards{width:100%;max-width:420px;display:flex;flex-direction:column;gap:8px;margin:12px 0}
-.score-card{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07)}
-.score-card.rank-1{background:rgba(241,196,15,.08);border-color:rgba(241,196,15,.25)}
-.score-card.rank-2{background:rgba(192,192,192,.06);border-color:rgba(192,192,192,.18)}
-.score-card.rank-3{background:rgba(205,127,50,.06);border-color:rgba(205,127,50,.18)}
-.score-card-medal{font-size:1.6em;width:36px;text-align:center;flex-shrink:0}
-.score-card-name{flex:1;font-weight:600;font-size:.95em;line-height:1.2}
-.score-card-name small{display:block;color:#aaa;font-size:.75em;font-weight:400;margin-top:2px}
-.score-card-pts{font-weight:800;font-size:1.2em;color:#f5a623;text-align:right;flex-shrink:0}
-.winner-banner{text-align:center;margin:8px 0 4px;padding:14px 16px;background:rgba(241,196,15,.08);border-radius:16px;border:1px solid rgba(241,196,15,.2)}
-.winner-name{font-size:1.1em;font-weight:700;color:#f5a623}
-.score-screen-content{width:100%;max-width:500px;display:flex;flex-direction:column;align-items:center;flex:1;overflow-y:auto;padding:0 16px 80px}
-.duration-badge{font-size:.75em;color:#aaa;margin:4px 0;padding:4px 10px;background:rgba(255,255,255,.05);border-radius:8px}
-
-/* ── OVERLAYS ── */
-#conn-status{position:fixed;top:0;left:0;right:0;z-index:9999;padding:0;display:flex;flex-direction:column;pointer-events:none}
-#conn-status.connecting,#conn-status.reconnecting{pointer-events:auto}
-#conn-status-text{display:none;text-align:center;font-size:.72em;padding:4px 8px;font-weight:600;letter-spacing:.5px}
-#conn-status.connecting #conn-status-text,#conn-status.reconnecting #conn-status-text{display:block;background:rgba(230,126,34,.9);color:#fff}
-#conn-status-bar{height:3px;background:transparent;width:0;transition:width .3s}
-#conn-status.connecting #conn-status-bar{background:#e67e22}
-#conn-status.reconnecting #conn-status-bar{background:#e74c3c}
-#conn-status.connected #conn-status-bar{background:#2ecc71;width:100%!important}
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(0,0,0,.85);color:#fff;padding:10px 20px;border-radius:24px;font-size:.9em;opacity:0;pointer-events:none;z-index:200;transition:opacity .3s,transform .3s;white-space:nowrap;max-width:90vw;text-align:center}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-#fullscreen-btn{position:fixed;top:calc(6px + env(safe-area-inset-top,0px));right:max(10px,env(safe-area-inset-right,0px));z-index:500;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.2);color:#fff;width:36px;height:36px;border-radius:50%;display:none;align-items:center;justify-content:center;font-size:1em;padding:0;min-height:auto;cursor:pointer;backdrop-filter:blur(6px)}
-#fullscreen-btn:hover{background:rgba(231,76,60,.5)}
-
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:none;align-items:center;justify-content:center;padding:16px}
-.modal-overlay.active{display:flex}
-.modal{background:#1e1e2e;border-radius:16px;padding:24px;max-width:400px;width:100%;border:1px solid rgba(255,255,255,.1)}
-.modal h3{margin-bottom:12px;font-size:1.1em}
-.modal p{font-size:.9em;color:#bbb;margin-bottom:20px}
-.modal .btn-group{margin-top:0;flex-direction:column}
-.modal .btn-group button{width:100%}
-
-#notif-banner{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(30,30,50,.95);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:8px;z-index:300;font-size:.82em;opacity:0;pointer-events:none;transition:opacity .3s;white-space:nowrap}
-#notif-banner.show{opacity:1;pointer-events:auto}
-#notif-banner button{padding:6px 12px;min-height:auto;font-size:.8em}
-
-/* ── BOOM OVERLAY ── */
-.boom-overlay{position:fixed;inset:0;pointer-events:none;z-index:400;overflow:hidden}
-.boom-particle{position:absolute;border-radius:3px;animation:boomFly .6s ease-out forwards}
-@keyframes boomFly{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(0)}}
-.boom-text{position:absolute;left:50%;top:45%;transform:translate(-50%,-50%);font-size:2em;font-weight:900;color:#fff;text-shadow:0 0 20px rgba(255,200,0,.8);animation:boomText .8s ease-out forwards}
-@keyframes boomText{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}30%{opacity:1;transform:translate(-50%,-50%) scale(1.3)}100%{opacity:0;transform:translate(-50%,-60%) scale(1)}}
-
-/* ── SPLASH ── */
-#splash-screen{position:fixed;inset:0;background:#1a1a2e;z-index:9998;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .8s}
-#splash-screen.fade-out{opacity:0;pointer-events:none}
-.splash-logo-wrap{text-align:center}
-.splash-title{font-size:3em;font-weight:900;background:linear-gradient(135deg,#e94560,#f5a623);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:6px;margin-bottom:16px}
-.splash-cards-row{display:flex;gap:8px;justify-content:center;margin-bottom:20px}
-.splash-card{width:48px;height:68px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.9em;font-weight:900;border:2px solid rgba(255,255,255,.2)}
-.splash-version{font-size:.7em;color:rgba(255,255,255,.4);letter-spacing:2px;margin-bottom:4px}
-.splash-tagline{font-size:.62em;color:rgba(255,255,255,.3);letter-spacing:.5px}
-.splash-progress{width:200px;height:3px;background:rgba(255,255,255,.1);border-radius:2px;margin-top:24px;overflow:hidden}
-.splash-progress-bar{height:100%;background:linear-gradient(90deg,#e94560,#f5a623);animation:splashLoad 4.5s ease-in-out forwards}
-@keyframes splashLoad{0%{width:0}100%{width:100%}}
-
-/* ── LOG BAR ── */
-#log-bar{font-size:.72em;color:rgba(255,255,255,.5)}
-.log-entry{text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-
-/* ── LEADERBOARD ── */
+.kick-btn{background:rgba(231,76,60,.15);border:1px solid rgba(231,76,60,.4);color:#e74c3c;font-size:.7em;padding:4px 10px;border-radius:8px;cursor:pointer;min-height:auto;font-weight:600}
+.wa-spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,.1);border-top-color:#e94560;border-radius:50%;animation:spin 1s linear infinite;margin:12px auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.join-request-item{background:rgba(233,69,96,.08);border:1px solid rgba(233,69,96,.3);border-radius:10px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.join-request-name{font-weight:600;font-size:.88em;flex:1}
+.join-request-btns{display:flex;gap:6px}
+.join-request-btns button{font-size:.75em;padding:6px 12px;min-height:auto;border-radius:8px}
+.join-request-btns .reject-btn{background:rgba(231,76,60,.2);border:1px solid rgba(231,76,60,.5);color:#e74c3c}
 .leaderboard-box{width:100%;max-width:320px;background:rgba(255,255,255,.04);border-radius:14px;padding:16px;margin-top:8px}
 .leaderboard-box h3{font-size:.9em;margin-bottom:12px;color:#ddd;text-align:center}
 .lb-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05)}
@@ -273,81 +233,36 @@ input::placeholder{color:#888}
 .lb-name{flex:1;font-size:.82em;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lb-wins{font-size:.75em;color:#f5a623;font-weight:700;width:32px;text-align:right}
 .lb-games{font-size:.72em;color:#888;width:28px;text-align:right}
-
-/* ── WAITING APPROVAL ── */
-.wa-spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,.1);border-top-color:#e94560;border-radius:50%;animation:spin 1s linear infinite;margin:12px auto}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-/* ── JOIN REQUESTS ── */
-.join-request-item{background:rgba(233,69,96,.08);border:1px solid rgba(233,69,96,.3);border-radius:10px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:8px}
-.join-request-name{font-weight:600;font-size:.88em;flex:1}
-.join-request-btns{display:flex;gap:6px}
-.join-request-btns button{font-size:.75em;padding:6px 12px;min-height:auto;border-radius:8px}
-.join-request-btns .reject-btn{background:rgba(231,76,60,.2);border:1px solid rgba(231,76,60,.5);color:#e74c3c}
+#log-bar{font-size:.72em;color:rgba(255,255,255,.5)}
+.log-entry{text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.reconnecting-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(231,76,60,.15);border:1px solid rgba(231,76,60,.4);border-radius:8px;padding:2px 8px;font-size:.68em;color:#e74c3c;animation:reconnectBlink 1.2s ease-in-out infinite}
+@keyframes reconnectBlink{0%,100%{opacity:1}50%{opacity:.4}}
+.score-option-group{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:8px}
+.score-option-btn{padding:10px 16px;min-height:auto;font-size:.9em;font-weight:700;border-radius:10px;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.15);color:#ddd;cursor:pointer;transition:all .2s}
+.score-option-btn.active,.score-option-btn:hover{background:rgba(233,69,96,.25);border-color:#e94560;color:#fff}
 
 /* ── GAME CONTENT ── */
 .game-content{display:flex;flex-direction:column;align-items:center;flex:1;overflow-y:auto;width:100%;max-width:700px;min-height:0}
-
-/* ── SCORE OPTIONS ── */
-.score-option-group{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:8px}
-.score-option-btn{padding:10px 16px;min-height:auto;font-size:.9em;font-weight:700;border-radius:10px;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.15);color:#ddd;cursor:pointer;transition:all .2s}
-.score-option-btn.active{background:rgba(233,69,96,.25);border-color:#e94560;color:#fff}
-.options-section{text-align:left}
-.options-label{font-size:.82em;color:#bbb;margin-bottom:6px;font-weight:600}
-
-/* ── DEKAL-SPECIFIC: hand rows layout ── */
-.dekal-hand{display:flex;flex-direction:column;gap:6px}
-.dekal-row{display:flex;gap:5px;align-items:center;justify-content:center}
-.row-marker{width:24px;font-size:.65em;color:rgba(255,255,255,.35);text-align:center;flex-shrink:0;font-weight:600}
-
-/* Highlight valid-move target cells */
-.card.drop-ok{box-shadow:0 0 14px rgba(46,204,113,.7);border-color:#2ecc71}
-.card.no-move{opacity:.4;pointer-events:none}
-
-/* Drawn card floating indicator */
-#drawn-card-indicator{
-  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
-  z-index:350;pointer-events:none;
-  display:flex;flex-direction:column;align-items:center;gap:6px;
-  opacity:0;transition:opacity .3s;
-}
-#drawn-card-indicator.show{opacity:1}
-#drawn-card-indicator .drawn-label{font-size:.7em;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:1px}
 </style>
 
 <script>
-(function() {
-  const suits=['♥','♦','♣','♠'];
-  const suitNames=['hearts','diamonds','clubs','spades'];
-  const ranks=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
-  const iconSvg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="80" fill="#1a1a2e"/><text x="120" y="220" font-family="Arial" font-size="160" fill="#e94560">♥</text><text x="260" y="220" font-family="Arial" font-size="160" fill="#e67e22">♦</text><text x="120" y="400" font-family="Arial" font-size="160" fill="#ccc">♣</text><text x="260" y="400" font-family="Arial" font-size="160" fill="#ccc">♠</text></svg>`;
+(function(){
+  const iconSvg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="80" fill="#1a1a2e"/><rect x="60" y="60" width="180" height="180" rx="14" fill="#2980b9"/><rect x="272" y="60" width="180" height="180" rx="14" fill="#e74c3c"/><rect x="60" y="272" width="180" height="180" rx="14" fill="#27ae60"/><rect x="272" y="272" width="180" height="180" rx="14" fill="#8e44ad"/><text x="150" y="175" text-anchor="middle" font-family="Arial Black" font-size="90" fill="white">5</text><text x="362" y="175" text-anchor="middle" font-family="Arial Black" font-size="90" fill="white">3</text><text x="150" y="387" text-anchor="middle" font-family="Arial Black" font-size="90" fill="white">7</text><text x="362" y="387" text-anchor="middle" font-family="Arial Black" font-size="90" fill="white">2</text></svg>`;
   const iconB64='data:image/svg+xml;base64,'+btoa(iconSvg);
-  const manifest={name:'Dékal Multijoueur',short_name:'Dékal',description:'Jeu de cartes Dékal multijoueur',start_url:'./',display:'fullscreen',background_color:'#1a1a2e',theme_color:'#1a1a2e',orientation:'any',icons:[{src:iconB64,sizes:'192x192',type:'image/svg+xml',purpose:'any maskable'},{src:iconB64,sizes:'512x512',type:'image/svg+xml',purpose:'any maskable'}]};
-  const blob=new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
+  const m={name:'Dékal Multijoueur',short_name:'Dékal',start_url:'./',display:'fullscreen',background_color:'#1a1a2e',theme_color:'#1a1a2e',orientation:'any',icons:[{src:iconB64,sizes:'512x512',type:'image/svg+xml',purpose:'any maskable'}]};
+  const blob=new Blob([JSON.stringify(m)],{type:'application/manifest+json'});
   document.getElementById('pwa-manifest').href=URL.createObjectURL(blob);
 })();
-if('serviceWorker' in navigator){
-  const sw=`const CACHE='dekal-v1.0.0';self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./']).catch(()=>{})));self.skipWaiting();});self.addEventListener('activate',()=>clients.claim());self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)).catch(()=>caches.match('./')));});`;
-  const swBlob=new Blob([sw],{type:'application/javascript'});
-  navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>{});
-}
+if('serviceWorker' in navigator){const sw=`const C='dekal-v1';self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',()=>clients.claim());`;navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});}
 </script>
 </head>
 <body>
 
 <!-- SPLASH -->
 <div id="splash-screen">
-  <div class="splash-logo-wrap">
-    <div class="splash-title">DÉKAL</div>
-    <div class="splash-cards-row">
-      <div class="splash-card suit-hearts">A♥</div>
-      <div class="splash-card suit-diamonds">K♦</div>
-      <div class="splash-card suit-clubs">7♣</div>
-      <div class="splash-card suit-spades">J♠</div>
-    </div>
-    <div class="splash-version">v1.0.0</div>
-    <div class="splash-tagline">crédits : claude.ai · @Pneubis</div>
-  </div>
+  <div class="splash-title">DÉKAL</div>
+  <div class="splash-sub">v1.0.0</div>
+  <div class="splash-tagline">crédits : claude.ai · @Pneubis</div>
   <div class="splash-progress"><div class="splash-progress-bar"></div></div>
 </div>
 
@@ -374,8 +289,7 @@ if('serviceWorker' in navigator){
   <h1>DÉKAL</h1>
   <p style="font-size:.85em;color:rgba(255,255,255,.65);letter-spacing:3px;margin:-4px 0 10px;font-weight:600">v1.0.0</p>
   <p class="subtitle" style="margin-top:0">
-    <button onclick="UI.showRules()" style="background:none;border:1px solid rgba(255,255,255,.25);color:#aaa;font-size:.8em;font-weight:600;padding:3px 12px;border-radius:20px;cursor:pointer;min-height:auto;transition:all .2s">ⓘ Règles</button>
-    <button onclick="UI.showOptions()" style="background:none;border:1px solid rgba(233,69,96,.35);color:rgba(233,69,96,.8);font-size:.8em;font-weight:600;padding:3px 12px;border-radius:20px;cursor:pointer;min-height:auto;transition:all .2s;margin-left:8px">⚙️ Options</button>
+    <button onclick="UI.showRules()" style="background:none;border:1px solid rgba(255,255,255,.25);color:#aaa;font-size:.8em;font-weight:600;padding:3px 12px;border-radius:20px;cursor:pointer;min-height:auto">ⓘ Règles</button>
   </p>
   <div style="margin:12px 0;width:100%;max-width:320px">
     <input type="text" id="player-name" placeholder="Votre pseudo" maxlength="12" autocomplete="off">
@@ -391,18 +305,18 @@ if('serviceWorker' in navigator){
       <div class="resume-code" id="resume-code">XXXXX</div>
     </div>
     <button class="resume-btn" onclick="App.resumeGame()">Reprendre</button>
-    <button class="resume-dismiss" onclick="App.dismissResume()" title="Ignorer">✕</button>
+    <button class="resume-dismiss" onclick="App.dismissResume()">✕</button>
   </div>
-  <div id="game-in-progress-banner" style="display:none;margin-top:10px;width:100%;max-width:320px;background:rgba(231,76,60,.1);border:1.5px solid rgba(231,76,60,.4);border-radius:10px;padding:8px 14px;text-align:center;font-size:.8em;color:#e74c3c;font-weight:600">⚠️ Une partie est déjà en cours sur ce code</div>
+  <div id="game-in-progress-banner" style="display:none;margin-top:10px;width:100%;max-width:320px;background:rgba(231,76,60,.1);border:1.5px solid rgba(231,76,60,.4);border-radius:10px;padding:8px 14px;text-align:center;font-size:.8em;color:#e74c3c;font-weight:600">⚠️ Une partie est déjà en cours</div>
   <div class="leaderboard-box" id="menu-leaderboard" style="margin-top:24px"></div>
-  <button id="reset-lb-btn" onclick="UI.confirmResetLeaderboard()" style="margin-top:10px;background:rgba(231,76,60,.12);border:1.5px solid rgba(231,76,60,.55);color:#e74c3c;font-size:.78em;font-weight:700;padding:8px 18px;border-radius:10px;cursor:pointer;min-height:auto;transition:all .2s">🗑 Réinitialiser le classement</button>
-  <p style="margin-top:18px;font-size:.62em;color:rgba(255,255,255,.4);letter-spacing:.5px;pointer-events:none;text-align:center">crédits : claude.ai · @Pneubis</p>
+  <button onclick="UI.confirmResetLeaderboard()" style="margin-top:10px;background:rgba(231,76,60,.12);border:1.5px solid rgba(231,76,60,.55);color:#e74c3c;font-size:.78em;font-weight:700;padding:8px 18px;border-radius:10px;cursor:pointer;min-height:auto">🗑 Réinitialiser le classement</button>
+  <p style="margin-top:18px;font-size:.62em;color:rgba(255,255,255,.4);text-align:center;pointer-events:none">crédits : claude.ai · @Pneubis</p>
 </div>
 
 <!-- SCREEN: JOIN -->
 <div class="screen" id="screen-join">
   <h1>DÉKAL</h1>
-  <h2 id="join-screen-title">Rejoindre une partie</h2>
+  <h2>Rejoindre une partie</h2>
   <div style="width:100%;max-width:320px;display:flex;flex-direction:column;gap:10px">
     <input type="text" id="join-name" placeholder="Votre pseudo" maxlength="12" autocomplete="off"
       style="text-align:center" oninput="document.getElementById('player-name').value=this.value">
@@ -430,13 +344,13 @@ if('serviceWorker' in navigator){
       <p style="color:#999;font-size:.78em;margin-top:8px" id="waiting-approval-name"></p>
     </div>
     <div id="lobby-solo-info" style="display:none;margin-bottom:12px">
-      <div style="background:rgba(39,174,96,.15);border:1.5px solid rgba(39,174,96,.5);border-radius:10px;padding:12px 14px;font-size:.9em;color:#fff;font-weight:700;text-align:center;margin-bottom:10px">🤖 Mode Solo — 1 bot adverse</div>
+      <div style="background:rgba(39,174,96,.15);border:1.5px solid rgba(39,174,96,.5);border-radius:10px;padding:12px;font-size:.9em;color:#fff;font-weight:700;text-align:center;margin-bottom:10px">🤖 Mode Solo — 1 bot adverse</div>
       <div style="margin-bottom:10px">
         <p style="font-size:.78em;color:#bbb;text-align:center;margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px;font-weight:600">Difficulté du bot</p>
         <div style="display:flex;gap:8px;justify-content:center">
-          <button id="diff-facile" onclick="App.setBotDifficulty('facile')" style="flex:1;padding:12px 6px;font-size:.85em;font-weight:700;background:rgba(39,174,96,.25);border:2px solid rgba(39,174,96,.6);color:#fff">😊 Facile</button>
-          <button id="diff-moyen"  onclick="App.setBotDifficulty('moyen')"  style="flex:1;padding:12px 6px;font-size:.85em;font-weight:700;background:rgba(241,196,15,.22);border:2px solid rgba(241,196,15,.6);color:#fff">🎯 Moyen</button>
-          <button id="diff-fort"   onclick="App.setBotDifficulty('fort')"   style="flex:1;padding:12px 6px;font-size:.85em;font-weight:700;background:rgba(231,76,60,.22);border:2px solid rgba(231,76,60,.6);color:#fff">💀 Fort</button>
+          <button id="diff-facile" onclick="App.setBotDifficulty('facile')" style="flex:1;padding:10px 4px;font-size:.82em;font-weight:700">😊 Facile</button>
+          <button id="diff-moyen"  onclick="App.setBotDifficulty('moyen')"  style="flex:1;padding:10px 4px;font-size:.82em;font-weight:700">🎯 Moyen</button>
+          <button id="diff-fort"   onclick="App.setBotDifficulty('fort')"   style="flex:1;padding:10px 4px;font-size:.82em;font-weight:700">💀 Fort</button>
         </div>
       </div>
       <button class="secondary" style="width:100%;font-size:.85em" onclick="App.switchToMulti()">🔀 Passer en multijoueur</button>
@@ -455,20 +369,20 @@ if('serviceWorker' in navigator){
 </div>
 
 <!-- SCREEN: GAME -->
-<div class="screen" id="screen-game" style="justify-content:flex-start;padding-top:0;height:100dvh;overflow:hidden;flex-direction:column;">
+<div class="screen" id="screen-game" style="justify-content:flex-start;padding-top:0;height:100dvh;overflow:hidden;flex-direction:column">
   <div class="game-header">
-    <div class="round-info" id="round-info">Manche 1</div>
+    <div class="round-info" id="round-info">Tour 1 / 16</div>
     <div class="game-header-top">
-      <button class="secondary" style="padding:6px 10px;font-size:.75em;min-height:36px;flex-shrink:0" onclick="UI.showRules()" title="Règles">?</button>
+      <button class="secondary" style="padding:6px 10px;font-size:.75em;min-height:36px;flex-shrink:0" onclick="UI.showRules()">?</button>
       <div class="game-status" id="game-status">En attente...</div>
-      <div style="width:36px;flex-shrink:0"></div>
+      <div style="width:36px"></div>
     </div>
   </div>
   <div class="game-content" id="game-content">
-    <div class="piles" id="piles-area"></div>
+    <div class="center-area" id="center-area" style="display:none"></div>
     <div class="players-area" id="players-area"></div>
   </div>
-  <div class="action-bar" id="action-bar" style="display:none"></div>
+  <div class="action-bar" id="action-bar"></div>
   <div id="log-bar" style="position:fixed;bottom:0;left:0;right:0;z-index:99;background:rgba(18,18,26,.7);backdrop-filter:blur(6px);border-top:1px solid rgba(255,255,255,.04);padding:3px 12px 5px;display:none;align-items:center;justify-content:center">
     <div id="action-log"></div>
   </div>
@@ -477,27 +391,12 @@ if('serviceWorker' in navigator){
 <!-- SCREEN: ROUND SCORES -->
 <div class="screen" id="screen-round-scores" style="justify-content:flex-start;padding-top:calc(6px + env(safe-area-inset-top,0px))">
   <div class="score-screen-content">
-    <h2 style="margin-bottom:2px;align-self:flex-start">Scores — Manche</h2>
-    <p class="subtitle" style="margin-bottom:4px;align-self:flex-start" id="round-scores-subtitle"></p>
+    <h2 style="margin-bottom:2px;align-self:flex-start">🏁 Fin de partie</h2>
+    <p class="subtitle" style="margin-bottom:8px;align-self:flex-start" id="round-scores-subtitle"></p>
     <table class="scores-table" id="round-scores-table"></table>
-    <div class="duration-badge" id="round-duration" style="display:none">⏱ <strong id="round-duration-value"></strong></div>
     <div class="btn-group" style="margin-top:16px;width:100%;justify-content:center">
-      <button id="next-round-btn" onclick="App.nextRound()">Manche suivante →</button>
-      <button class="danger" onclick="UI.confirmQuitGame()" style="min-height:48px;padding:12px 20px;font-size:.9em">✕ Quitter</button>
-    </div>
-  </div>
-</div>
-
-<!-- SCREEN: FINAL SCORES -->
-<div class="screen" id="screen-final-scores" style="justify-content:flex-start;padding-top:calc(6px + env(safe-area-inset-top,0px))">
-  <div class="score-screen-content">
-    <h1 style="margin-bottom:6px">🏆 Fin de partie</h1>
-    <div id="final-winner-banner" class="winner-banner" style="width:100%"></div>
-    <div id="final-score-cards" class="score-cards"></div>
-    <div class="duration-badge" id="final-duration" style="display:none">⏱ Partie terminée en <strong id="final-duration-value"></strong></div>
-    <div class="leaderboard-box" id="final-leaderboard"></div>
-    <div class="btn-group" style="margin-top:16px;width:100%;justify-content:center">
-      <button onclick="App.backToMenu(true)">Menu principal</button>
+      <button id="next-round-btn" onclick="App.nextRound()">Rejouer →</button>
+      <button class="danger" onclick="App.backToMenu(true)" style="min-height:48px;padding:12px 20px;font-size:.9em">🏠 Menu</button>
     </div>
   </div>
 </div>
@@ -505,560 +404,369 @@ if('serviceWorker' in navigator){
 <script>
 "use strict";
 // ============================================================
-// DÉKAL MULTIJOUEUR — Version 1.0.0
+// DÉKAL MULTIJOUEUR v1.0
 //
-// RÈGLES DÉKAL :
-// Chaque joueur a 5 cartes en main (posées face visible devant lui).
-// Le jeu comprend un jeu standard de 52 cartes + 2 jokers.
-// À son tour, un joueur :
-//   1. Pioche 1 carte depuis la pioche ou la défausse
-//   2. Doit déplacer/placer la carte prise dans sa main en
-//      échangeant avec une carte existante (défaussant l'ancienne)
-//      OU simplement défausser la carte piochée et déplacer
-//      une carte de sa main vers la défausse.
-// But : former la meilleure combinaison possible (séquence ou
-//       même couleur) quand on dit "Dékal !" et clôture la manche.
-// Score : valeur des cartes restantes (A=1, 2-10=valeur, J/Q/K=10).
-//         Le joueur qui dit Dékal doit avoir le plus bas score,
-//         sinon son score est doublé.
-// Fin de partie : quand un joueur atteint targetScore pts cumulés.
+// RÈGLES EXACTES :
+// - 100 cartes Dékal numérotées
+// - 16 cartes par joueur en grille 4×4, faces CACHÉES
+// - Chaque tour (16 au total) :
+//   1. Chaque joueur choisit 1 carte face cachée de sa grille et la pose au centre
+//   2. Révélation simultanée
+//   3. Le joueur avec le pion DÉKAL choisit une carte parmi celles posées au centre
+//   4. Il insère la carte choisie dans sa grille par l'extérieur (pousse ligne ou colonne)
+//      La carte qui sort de la grille est écartée du jeu
+//   5. Le pion passe au joueur suivant
+// - Après 16 tours : toutes les cartes sont révélées
+// - Les cartes adjacentes de même valeur (H et V) s'annulent
+// - Score = somme des cartes restantes → le plus bas gagne
 // ============================================================
 
-// ============================================================
-// 1. CONSTANTS
-// ============================================================
-const HAND_SIZE = 5;      // cartes en main par joueur
+// ── CONSTANTS ──
+const GRID = 4;           // 4×4
+const TOTAL_TURNS = 16;   // 16 tours par partie
 const MAX_PLAYERS = 6;
-const END_SCORE = 100;
 const RECONNECT_TIMEOUT_MS = 15000;
 const MAX_LOG_ENTRIES = 2;
 const HOST_MIGRATION_DELAY_MS = 1500;
 
-// Valeurs des cartes pour le scoring
-function cardValue(rank) {
-  if (rank === 'A') return 1;
-  if (['J','Q','K'].includes(rank)) return 10;
-  if (rank === 'JK') return 0; // joker = 0 pts
-  return parseInt(rank);
+// 100 cartes Dékal : on génère des valeurs 1-15 (distribution approximative)
+function createDekDeck() {
+  const deck = [];
+  // Cartes 1 à 15, distribution pondérée (plus de petites valeurs)
+  const dist = {1:10,2:10,3:10,4:8,5:8,6:8,7:8,8:8,9:8,10:6,11:6,12:6,13:4,14:4,15:4};
+  for (const [v, n] of Object.entries(dist)) {
+    for (let i = 0; i < n; i++) deck.push(parseInt(v));
+  }
+  return shuffle(deck);
 }
 
-function cardLabel(c) {
-  if (!c) return '?';
-  if (c.rank === 'JK') return '🃏';
-  return c.rank + c.suit;
+function cvClass(v) {
+  if (v <= 3) return 'cv-low';
+  if (v <= 6) return 'cv-mid';
+  if (v <= 9) return 'cv-high';
+  return 'cv-top';
 }
 
-function cardSuitClass(c) {
-  if (!c) return '';
-  if (c.rank === 'JK') return 'suit-joker';
-  const m = {'♥':'suit-hearts','♦':'suit-diamonds','♣':'suit-clubs','♠':'suit-spades'};
-  return m[c.suit] || '';
-}
-
-// ============================================================
-// 2. STATE
-// ============================================================
-let peer = null;
-let connections = {};
-let hostConn = null;
-let isHost = false;
-let myPeerId = '';
-let myName = '';
-let roomCode = '';
-let gameState = null;
-let myPlayerId = '';
+// ── STATE ──
+let peer = null, connections = {}, hostConn = null;
+let isHost = false, myPeerId = '', myName = '', roomCode = '';
+let gameState = null, myPlayerId = '';
 let currentScreen = 'screen-menu';
-let reconnectTimer = null;
-let reconnectAttempt = 0;
-let _rejectedByHost = false;
-let _hostMigrationTimer = null;
-let _allPeerIds = [];
-let _awaitingNewHost = false;
-// Interaction state (client-side only)
-let _selectedCardIndex = null; // index in hand of selected card for swap
+let reconnectTimer = null, reconnectAttempt = 0;
+let _hostMigrationTimer = null, _allPeerIds = [], _awaitingNewHost = false;
+// UI state
+let _mySelectedCard = null; // {row,col} — carte choisie pour le centre
 
-// ============================================================
-// 3. LEADERBOARD
-// ============================================================
+// ── LEADERBOARD ──
 const Leaderboard = (() => {
-  function get() { try { return JSON.parse(localStorage.getItem('dekal_leaderboard') || '{}'); } catch(e) { return {}; } }
-  function save(lb) { try { localStorage.setItem('dekal_leaderboard', JSON.stringify(lb)); } catch(e) {} }
-  function update(playerName, won) {
-    const lb = get();
-    if (!lb[playerName]) lb[playerName] = { wins: 0, games: 0 };
-    lb[playerName].games++;
-    if (won) lb[playerName].wins++;
-    save(lb);
+  const KEY = 'dekal_lb';
+  const get = () => { try { return JSON.parse(localStorage.getItem(KEY)||'{}'); } catch(e) { return {}; } };
+  const save = lb => { try { localStorage.setItem(KEY,JSON.stringify(lb)); } catch(e) {} };
+  function update(name, won) { const lb=get(); if(!lb[name]) lb[name]={wins:0,games:0}; lb[name].games++; if(won) lb[name].wins++; save(lb); }
+  function render(cid) {
+    const c=document.getElementById(cid); if(!c) return;
+    const entries=Object.entries(get()).sort((a,b)=>b[1].wins-a[1].wins||a[1].games-b[1].games);
+    if(!entries.length){ c.innerHTML='<h3>🏆 Classement</h3><p style="color:#999;font-size:.85em;text-align:center">Aucune partie</p>'; return; }
+    let h='<h3>🏆 Classement</h3>'; entries.slice(0,10).forEach(([n,d],i)=>{ const r=i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1; h+=`<div class="lb-row"><span class="lb-rank">${r}</span><span class="lb-name">${n}</span><span class="lb-wins">${d.wins}V</span><span class="lb-games">${d.games}P</span></div>`; });
+    c.innerHTML=h;
   }
-  function render(containerId) {
-    const lb = get();
-    const container = document.getElementById(containerId);
-    if (!container) return;
-    const entries = Object.entries(lb).sort((a, b) => b[1].wins - a[1].wins || a[1].games - b[1].games);
-    if (entries.length === 0) { container.innerHTML = '<h3>🏆 Classement</h3><p style="color:#999;font-size:.85em;text-align:center">Aucune partie terminée</p>'; return; }
-    let html = '<h3>🏆 Classement persistant</h3>';
-    entries.slice(0, 10).forEach(([name, data], i) => {
-      const rank = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1);
-      html += `<div class="lb-row"><span class="lb-rank">${rank}</span><span class="lb-name">${name}</span><span class="lb-wins">${data.wins}W</span><span class="lb-games">${data.games}G</span></div>`;
-    });
-    container.innerHTML = html;
-  }
-  function reset() { try { localStorage.removeItem('dekal_leaderboard'); } catch(e) {} }
+  function reset() { try { localStorage.removeItem(KEY); } catch(e) {} }
   return { update, render, reset };
 })();
 
-// ============================================================
-// 4. SOUND
-// ============================================================
+// ── SOUND ──
 const Sound = (() => {
-  let ctx = null, enabled = true;
-  function getCtx() {
-    if (!ctx) { try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) { return null; } }
-    if (ctx.state === 'suspended') ctx.resume();
-    return ctx;
-  }
+  let ctx=null, enabled=true;
+  const gc=()=>{ if(!ctx){ try{ctx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){return null;} } if(ctx.state==='suspended')ctx.resume(); return ctx; };
   function play(type) {
-    if (!enabled) return;
-    const c = getCtx(); if (!c) return;
+    if(!enabled) return; const c=gc(); if(!c) return;
     try {
-      const osc = c.createOscillator(), gain = c.createGain();
-      osc.connect(gain); gain.connect(c.destination);
+      const o=c.createOscillator(), g=c.createGain(); o.connect(g); g.connect(c.destination);
       switch(type) {
-        case 'card_flip': osc.type='sine';osc.frequency.setValueAtTime(660,c.currentTime);osc.frequency.exponentialRampToValueAtTime(330,c.currentTime+0.12);gain.gain.setValueAtTime(0.15,c.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,c.currentTime+0.15);osc.start(c.currentTime);osc.stop(c.currentTime+0.15);break;
-        case 'swap': osc.type='triangle';osc.frequency.setValueAtTime(440,c.currentTime);osc.frequency.setValueAtTime(550,c.currentTime+0.08);gain.gain.setValueAtTime(0.12,c.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,c.currentTime+0.2);osc.start(c.currentTime);osc.stop(c.currentTime+0.2);break;
-        case 'dekal': [523,659,784,1047].forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(0.2,c.currentTime+i*.1);g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+i*.1+0.3);o.start(c.currentTime+i*.1);o.stop(c.currentTime+i*.1+0.3);}); return;
-        case 'your_turn': osc.type='triangle';osc.frequency.setValueAtTime(523,c.currentTime);osc.frequency.setValueAtTime(659,c.currentTime+0.12);gain.gain.setValueAtTime(0.2,c.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,c.currentTime+0.3);osc.start(c.currentTime);osc.stop(c.currentTime+0.3);break;
-        case 'boom': osc.type='sawtooth';osc.frequency.setValueAtTime(200,c.currentTime);osc.frequency.exponentialRampToValueAtTime(40,c.currentTime+0.4);gain.gain.setValueAtTime(0.3,c.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,c.currentTime+0.4);osc.start(c.currentTime);osc.stop(c.currentTime+0.4);break;
-        case 'win': [523,659,784,1047].forEach((freq,i)=>{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='triangle';o.frequency.value=freq;g.gain.setValueAtTime(0.15,c.currentTime+i*.12);g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+i*.12+0.3);o.start(c.currentTime+i*.12);o.stop(c.currentTime+i*.12+0.3);}); return;
+        case 'pick': o.type='sine';o.frequency.setValueAtTime(550,c.currentTime);o.frequency.exponentialRampToValueAtTime(880,c.currentTime+.1);g.gain.setValueAtTime(.12,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.15);o.start(c.currentTime);o.stop(c.currentTime+.15);break;
+        case 'push': o.type='triangle';o.frequency.setValueAtTime(330,c.currentTime);o.frequency.setValueAtTime(440,c.currentTime+.06);g.gain.setValueAtTime(.15,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.2);o.start(c.currentTime);o.stop(c.currentTime+.2);break;
+        case 'annul': [440,550,660].forEach((f,i)=>{const o2=c.createOscillator(),g2=c.createGain();o2.connect(g2);g2.connect(c.destination);o2.type='triangle';o2.frequency.value=f;g2.gain.setValueAtTime(.12,c.currentTime+i*.07);g2.gain.exponentialRampToValueAtTime(.001,c.currentTime+i*.07+.25);o2.start(c.currentTime+i*.07);o2.stop(c.currentTime+i*.07+.25);}); return;
+        case 'your_turn': o.type='triangle';o.frequency.setValueAtTime(523,c.currentTime);o.frequency.setValueAtTime(659,c.currentTime+.12);g.gain.setValueAtTime(.2,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.3);o.start(c.currentTime);o.stop(c.currentTime+.3);break;
+        case 'win': [523,659,784,1047].forEach((f,i)=>{const o2=c.createOscillator(),g2=c.createGain();o2.connect(g2);g2.connect(c.destination);o2.type='triangle';o2.frequency.value=f;g2.gain.setValueAtTime(.15,c.currentTime+i*.12);g2.gain.exponentialRampToValueAtTime(.001,c.currentTime+i*.12+.3);o2.start(c.currentTime+i*.12);o2.stop(c.currentTime+i*.12+.3);}); return;
       }
-    } catch(e) {}
+    } catch(e){}
   }
-  function toggle() { enabled = !enabled; return enabled; }
-  return { play, toggle, isEnabled: () => enabled };
+  return { play, toggle:()=>{enabled=!enabled;return enabled;} };
 })();
 
-// ============================================================
-// 5. NOTIFICATIONS
-// ============================================================
+// ── NOTIFICATIONS ──
 const Notif = (() => {
-  let permitted = false;
-  function init() { if (!('Notification' in window)) return; if (localStorage.getItem('dekal_notif_asked')) return; document.getElementById('notif-banner').classList.add('show'); }
-  async function requestPermission() { dismissBanner(); localStorage.setItem('dekal_notif_asked','1'); if (!('Notification' in window)) return; const r = await Notification.requestPermission(); permitted = (r === 'granted'); if (permitted) UI.toast('🔔 Notifications activées'); }
+  let permitted=false;
+  function checkGranted() { if('Notification'in window&&Notification.permission==='granted'){permitted=true;localStorage.setItem('dekal_notif_asked','1');} }
+  async function requestPermission() { dismissBanner(); localStorage.setItem('dekal_notif_asked','1'); if(!('Notification'in window))return; const r=await Notification.requestPermission(); permitted=(r==='granted'); if(permitted)UI.toast('🔔 Notifications activées'); }
   function dismissBanner() { document.getElementById('notif-banner').classList.remove('show'); localStorage.setItem('dekal_notif_asked','1'); }
   function notifyMyTurn() {
     Sound.play('your_turn');
-    if (navigator.vibrate) navigator.vibrate([150,80,150]);
-    if (permitted && document.hidden) { try { new Notification('DÉKAL — C\'est votre tour !', { body: 'À vous de jouer', tag: 'dekal-turn', renotify: true }); } catch(e) {} }
+    if(navigator.vibrate)navigator.vibrate([150,80,150]);
+    if(permitted&&document.hidden){try{new Notification('DÉKAL — À vous de jouer !',{body:'Choisissez une carte',tag:'dekal-turn',renotify:true});}catch(e){}}
   }
-  function checkGranted() { if ('Notification' in window && Notification.permission === 'granted') { permitted = true; localStorage.setItem('dekal_notif_asked','1'); } }
-  return { init, requestPermission, dismissBanner, notifyMyTurn, checkGranted };
+  return { checkGranted, requestPermission, dismissBanner, notifyMyTurn };
 })();
 
-// ============================================================
-// 6. UI
-// ============================================================
+// ── UI ──
 const UI = (() => {
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-
+  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
   function showScreen(id) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-    currentScreen = id;
-    if (id === 'screen-menu') { Leaderboard.render('menu-leaderboard'); resetJoinButton(); setTimeout(() => { try { App.checkResume(); } catch(e) {} }, 0); }
-    if (id === 'screen-game') _doFullscreen();
-    const quitBtn = document.getElementById('fullscreen-btn');
-    if (quitBtn) quitBtn.style.display = (id === 'screen-game') ? 'block' : 'none';
-    const logBar = document.getElementById('log-bar');
-    if (logBar) logBar.style.display = (id === 'screen-game') ? 'flex' : 'none';
+    currentScreen=id;
+    if(id==='screen-menu'){Leaderboard.render('menu-leaderboard');resetJoinButton();setTimeout(()=>{try{App.checkResume();}catch(e){}},0);}
+    if(id==='screen-game')_doFullscreen();
+    const qb=document.getElementById('fullscreen-btn'); if(qb)qb.style.display=(id==='screen-game')?'flex':'none';
+    const lb=document.getElementById('log-bar'); if(lb)lb.style.display=(id==='screen-game')?'flex':'none';
   }
-
-  function toast(msg) {
-    const el = document.getElementById('toast');
-    el.textContent = msg;
-    el.classList.add('show');
-    setTimeout(() => el.classList.remove('show'), 2500);
-  }
-
-  function showModal(title, text, buttons) {
-    document.getElementById('modal-title').textContent = title;
-    document.getElementById('modal-text').innerHTML = text;
-    const btnContainer = document.getElementById('modal-buttons');
-    btnContainer.innerHTML = '';
-    buttons.forEach(b => {
-      const btn = document.createElement('button');
-      btn.textContent = b.text;
-      btn.addEventListener('click', () => { eval(b.action); });
-      btnContainer.appendChild(btn);
-    });
+  function toast(msg) { const e=document.getElementById('toast'); e.textContent=msg; e.classList.add('show'); setTimeout(()=>e.classList.remove('show'),2500); }
+  function showModal(title,text,buttons) {
+    document.getElementById('modal-title').textContent=title;
+    document.getElementById('modal-text').innerHTML=text;
+    const bc=document.getElementById('modal-buttons'); bc.innerHTML='';
+    buttons.forEach(b=>{ const btn=document.createElement('button'); btn.textContent=b.text; btn.addEventListener('click',()=>eval(b.action)); bc.appendChild(btn); });
     document.getElementById('modal').classList.add('active');
   }
-
   function closeModal() { document.getElementById('modal').classList.remove('active'); }
-
   function showRules() {
-    showModal('Règles Dékal', `
-      <div style="text-align:left;font-size:.85em;max-height:60vh;overflow-y:auto;line-height:1.6">
-      <b>But :</b> Avoir le score le plus bas à la fin de la partie.<br><br>
-      <b>Mise en place :</b> Chaque joueur reçoit <b>5 cartes</b> posées face visible devant lui.<br><br>
-      <b>Tour :</b><br>
-      • Piochez 1 carte (depuis la <b>pioche</b> ou la <b>défausse</b>)<br>
-      • Échangez-la contre l'une de vos 5 cartes (la carte échangée va à la défausse)<br>
-      • <b>OU</b> défaussez la carte piochée directement (sans échange)<br><br>
-      <b>Dékal !</b> À tout moment après avoir joué, vous pouvez déclarer "Dékal !" pour clôturer la manche. Chaque autre joueur joue encore <b>un dernier tour</b>.<br><br>
-      <b>Score :</b> Somme des valeurs de vos 5 cartes. A=1, 2-10=valeur, J/Q/K=10, Joker=0.<br><br>
-      <b>Pénalité Dékal :</b> Si le joueur qui a dit Dékal n'a pas le score le plus bas, son score est <b>doublé</b> !<br><br>
-      <b>Fin de partie :</b> Quand un joueur atteint le score limite. Celui avec le score total le plus bas gagne !
-      </div>
-    `, [{ text: 'Compris !', action: 'UI.closeModal()' }]);
+    showModal('Règles Dékal',`
+      <b>But :</b> Avoir le score le plus faible à la fin.<br><br>
+      <b>Mise en place :</b> Chaque joueur reçoit 16 cartes, faces cachées, disposées en grille 4×4.<br><br>
+      <b>Déroulement (16 tours) :</b><br>
+      1. Chaque joueur choisit 1 carte <b>face cachée</b> de sa grille et la pose au centre<br>
+      2. Révélation <b>simultanée</b><br>
+      3. Le joueur avec le <b>🏅 pion Dékal</b> choisit en premier l'une des cartes révélées<br>
+      4. Il <b>insère</b> cette carte dans sa grille par l'extérieur → elle pousse une ligne ou colonne. La carte qui sort est écartée<br>
+      5. Les autres joueurs font de même avec les cartes restantes (dans l'ordre)<br>
+      6. Le pion passe au joueur suivant<br><br>
+      <b>Fin :</b> Après 16 tours, toutes les cartes sont révélées. Les cartes <b>adjacentes de même valeur</b> (horizontalement et verticalement) s'annulent.<br><br>
+      <b>Score :</b> Somme des cartes restantes. Le plus bas gagne !
+    `,[{text:'Compris !',action:'UI.closeModal()'}]);
   }
-
   function _doFullscreen() {
-    if (isIOS) return;
-    const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
-    if (isFs) return;
-    const el = document.documentElement;
-    const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen;
-    if (!req) return;
-    req.call(el).then(() => { try { screen.orientation?.lock?.('portrait'); } catch(e) {} }).catch(() => {});
+    if(isIOS)return;
+    if(!!(document.fullscreenElement||document.webkitFullscreenElement))return;
+    const e=document.documentElement, r=e.requestFullscreen||e.webkitRequestFullscreen||e.mozRequestFullScreen;
+    if(r)r.call(e).then(()=>{try{screen.orientation?.lock?.('portrait');}catch(e){}}).catch(()=>{});
   }
-
-  function setConnStatus(status, msg) {
-    const el = document.getElementById('conn-status');
-    el.className = status;
-    _connStatusMsg = msg || '';
-    const txt = document.getElementById('conn-status-text');
-    if (txt) txt.textContent = _connStatusMsg;
-    if (!status) { clearInterval(_progressTimer); setConnProgress(0); }
+  function setConnStatus(status,msg) {
+    document.getElementById('conn-status').className=status;
+    _connMsg=msg||'';
+    const t=document.getElementById('conn-status-text'); if(t)t.textContent=_connMsg;
+    if(!status){clearInterval(_pTimer);setCP(0);}
   }
-
-  let _progressTimer = null, _connStatusMsg = '';
-  function startConnProgress(durationMs, maxPct) {
-    clearInterval(_progressTimer); setConnProgress(0);
-    const steps = 40, interval = durationMs / steps; let step = 0;
-    _progressTimer = setInterval(() => {
-      step++;
-      const pct = Math.round(maxPct * (1 - Math.pow(1 - step/steps, 2)));
-      setConnProgress(pct);
-      const txt = document.getElementById('conn-status-text');
-      if (txt && _connStatusMsg) txt.textContent = _connStatusMsg + ' ' + pct + '%';
-      if (step >= steps) clearInterval(_progressTimer);
-    }, interval);
+  let _pTimer=null,_connMsg='';
+  function startConnProgress(dur,max) {
+    clearInterval(_pTimer);setCP(0);
+    const steps=40,iv=dur/steps;let step=0;
+    _pTimer=setInterval(()=>{ step++; const p=Math.round(max*(1-Math.pow(1-step/steps,2))); setCP(p); const t=document.getElementById('conn-status-text'); if(t&&_connMsg)t.textContent=_connMsg+' '+p+'%'; if(step>=steps)clearInterval(_pTimer); },iv);
   }
-  function finishConnProgress() { clearInterval(_progressTimer); setConnProgress(100); const txt = document.getElementById('conn-status-text'); if (txt && _connStatusMsg) txt.textContent = _connStatusMsg + ' 100%'; setTimeout(() => setConnProgress(0), 400); }
-  function setConnProgress(pct) { const bar = document.getElementById('conn-status-bar'); if (bar) bar.style.width = pct + '%'; }
-
-  window.addEventListener('beforeunload', (e) => {
-    if (gameState && gameState.phase !== 'lobby' && gameState.phase !== 'game_over') { e.preventDefault(); e.returnValue = ''; }
-  });
-
-  function confirmResetLeaderboard() { showModal('🗑 Réinitialiser le classement', 'Toutes les statistiques seront supprimées.', [{ text: 'Annuler', action: 'UI.closeModal()' }, { text: '⚠️ Confirmer', action: 'UI.resetLeaderboard()' }]); }
-  function resetLeaderboard() { Leaderboard.reset(); closeModal(); Leaderboard.render('menu-leaderboard'); toast('Classement réinitialisé'); }
-  function confirmQuitGame() { showModal('Quitter la partie ?', 'Que souhaitez-vous faire ?', [{ text: 'Continuer', action: 'UI.closeModal()' }, { text: '🏠 Menu principal', action: 'UI.closeModal();App.backToMenu(true)' }, { text: '✕ Fermer l\'app', action: 'UI.closeModal();window.close()' }]); }
-  function showOptions() {
-    const scores = [50, 75, 100, 150, 200];
-    const current = (typeof App !== 'undefined' ? App._targetScore : null) || END_SCORE;
-    const btnHtml = scores.map(s => `<button class="score-option-btn${s===current?' active':''}" data-val="${s}" onclick="UI.setTargetScore(${s})">${s}</button>`).join('');
-    showModal('⚙️ Options', `<div class="options-section"><div class="options-label">Score limite pour terminer la partie</div><div class="score-option-group">${btnHtml}</div><div style="font-size:.72em;color:#999;text-align:center;margin-top:4px">Par défaut : 100 pts</div></div>`, [{ text: 'Fermer', action: 'UI.closeModal()' }]);
-  }
-  function setTargetScore(val) {
-    App._targetScore = val;
-    document.querySelectorAll('.score-option-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.val) === val));
-    if (typeof gameState !== 'undefined' && gameState && gameState.phase === 'lobby') { gameState.targetScore = val; if (typeof Network !== 'undefined') Network.broadcastState(); }
-    closeModal();
-  }
+  function finishConnProgress() { clearInterval(_pTimer);setCP(100); const t=document.getElementById('conn-status-text'); if(t&&_connMsg)t.textContent=_connMsg+' 100%'; setTimeout(()=>setCP(0),400); }
+  function setCP(p) { const b=document.getElementById('conn-status-bar'); if(b)b.style.width=p+'%'; }
+  window.addEventListener('beforeunload',e=>{ if(gameState&&gameState.phase!=='lobby'&&gameState.phase!=='game_over'){e.preventDefault();e.returnValue='';} });
+  function confirmResetLeaderboard() { showModal('🗑 Réinitialiser','Toutes les statistiques seront supprimées.',[{text:'Annuler',action:'UI.closeModal()'},{text:'⚠️ Confirmer',action:'UI.resetLeaderboard()'}]); }
+  function resetLeaderboard() { Leaderboard.reset();closeModal();Leaderboard.render('menu-leaderboard');toast('Classement réinitialisé'); }
+  function confirmQuitGame() { showModal('Quitter ?','Que souhaitez-vous faire ?',[{text:'Continuer',action:'UI.closeModal()'},{text:'🏠 Menu',action:'UI.closeModal();App.backToMenu(true)'},{text:'✕ Fermer',action:'UI.closeModal();window.close()'}]); }
   function showGameInProgressWarning() {
-    const btn = document.getElementById('join-btn'), banner = document.getElementById('game-in-progress-banner');
-    if (btn) { btn.disabled = true; btn.style.opacity = '0.4'; btn.textContent = '🔒 Rejoindre une partie'; }
-    if (banner) banner.style.display = '';
-    setTimeout(() => resetJoinButton(), 15000);
+    const btn=document.getElementById('join-btn'),banner=document.getElementById('game-in-progress-banner');
+    if(btn){btn.disabled=true;btn.style.opacity='0.4';btn.textContent='🔒 Rejoindre';}
+    if(banner)banner.style.display='';
+    setTimeout(()=>resetJoinButton(),15000);
   }
   function resetJoinButton() {
-    const btn = document.getElementById('join-btn'), banner = document.getElementById('game-in-progress-banner');
-    if (btn) { btn.disabled = false; btn.style.opacity = ''; btn.textContent = '🔗 Rejoindre une partie'; }
-    if (banner) banner.style.display = 'none';
+    const btn=document.getElementById('join-btn'),banner=document.getElementById('game-in-progress-banner');
+    if(btn){btn.disabled=false;btn.style.opacity='';btn.textContent='🔗 Rejoindre une partie';}
+    if(banner)banner.style.display='none';
   }
-
-  return { showScreen, toast, showModal, closeModal, showRules, _doFullscreen, setConnStatus, startConnProgress, finishConnProgress, confirmResetLeaderboard, resetLeaderboard, confirmQuitGame, showOptions, setTargetScore, showGameInProgressWarning, resetJoinButton };
+  return { showScreen,toast,showModal,closeModal,showRules,_doFullscreen,setConnStatus,startConnProgress,finishConnProgress,confirmResetLeaderboard,resetLeaderboard,confirmQuitGame,showGameInProgressWarning,resetJoinButton };
 })();
 
-// ============================================================
-// 7. ACTION LOG
-// ============================================================
+// ── ACTION LOG ──
 const ActionLog = (() => {
-  const entries = [];
-  function add(msg) {
-    const container = document.getElementById('action-log'); if (!container) return;
-    entries.push(msg); if (entries.length > MAX_LOG_ENTRIES) entries.shift();
-    container.innerHTML = entries.map(e => `<div class="log-entry">${e}</div>`).join('');
-  }
-  function clear() { entries.length = 0; const c = document.getElementById('action-log'); if (c) c.innerHTML = ''; }
-  return { add, clear };
+  const entries=[];
+  function add(msg){ const c=document.getElementById('action-log');if(!c)return; entries.push(msg);if(entries.length>MAX_LOG_ENTRIES)entries.shift(); c.innerHTML=entries.map(e=>`<div class="log-entry">${e}</div>`).join(''); }
+  function clear(){ entries.length=0; const c=document.getElementById('action-log');if(c)c.innerHTML=''; }
+  return {add,clear};
 })();
 
-// ============================================================
-// 8. NETWORK — Couche PeerJS (identique à Skyjo)
-// ============================================================
+// ── NETWORK (PeerJS — identique Skyjo) ──
 const Network = (() => {
-  const PEER_SERVER_HOST = 'skyjo-i51h.onrender.com';
-  const PEER_SERVER_PATH = '/peerjs';
-  const PEER_SERVER_HOST_FALLBACK = '0.peerjs.com';
-  const PEER_SERVER_PATH_FALLBACK = '/';
-  const ICE_CONFIG = {
-    iceServers: [
-      { urls: 'stun:stun.l.google.com:19302' },
-      { urls: 'stun:stun1.l.google.com:19302' },
-      { urls: 'stun:stun.cloudflare.com:3478' },
-      { urls: 'turn:openrelay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
-      { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
-      { urls: 'turns:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
-    ],
-    iceCandidatePoolSize: 10,
-  };
-
-  let _activePeerServer = null;
-  let pendingRequests = {};
+  const PEER_SERVER_HOST='skyjo-i51h.onrender.com', PEER_SERVER_PATH='/peerjs';
+  const PEER_SERVER_HOST_FB='0.peerjs.com', PEER_SERVER_PATH_FB='/';
+  const ICE={ iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'},{urls:'stun:stun.cloudflare.com:3478'},{urls:'turn:openrelay.metered.ca:80',username:'openrelayproject',credential:'openrelayproject'},{urls:'turn:openrelay.metered.ca:443',username:'openrelayproject',credential:'openrelayproject'},{urls:'turns:openrelay.metered.ca:443',username:'openrelayproject',credential:'openrelayproject'}],iceCandidatePoolSize:10 };
+  let pendingRequests={};
 
   function initPeer(id) {
-    if (peer) { try { peer.destroy(); } catch(e) {} peer = null; }
-    function tryServer(host, port, path, secure, onSuccess, onFail) {
-      let settled = false;
-      UI.startConnProgress(12000, 90);
-      function succeed(pid) { if (settled) return; settled = true; clearTimeout(timer); myPeerId = pid; _activePeerServer = { host, port, path, secure }; onSuccess(pid); }
-      function fail(err) { if (settled) return; settled = true; clearTimeout(timer); try { if (peer) { peer.destroy(); peer = null; } } catch(e) {} onFail(err); }
-      const timer = setTimeout(() => fail(new Error('timeout')), 12000);
-      try { const opts = { host, port, path, secure, config: ICE_CONFIG, debug: 1 }; peer = id ? new Peer(id, opts) : new Peer(opts); } catch(e) { fail(new Error(e.message)); return; }
-      peer.on('open', pid => { UI.finishConnProgress(); UI.setConnStatus('connecting', '📡 Connecté au serveur'); succeed(pid); });
-      peer.on('error', err => { if (err.type === 'unavailable-id') fail(new Error('HOST_MIGRATED')); else fail(new Error(err.type || 'peer-error')); });
-      peer.on('disconnected', () => { if (peer && !settled) peer.reconnect(); });
+    if(peer){try{peer.destroy();}catch(e){}peer=null;}
+    function tryServer(host,port,path,secure,onOk,onFail){
+      let settled=false;
+      UI.startConnProgress(12000,90);
+      function ok(pid){if(settled)return;settled=true;clearTimeout(timer);myPeerId=pid;onOk(pid);}
+      function fail(err){if(settled)return;settled=true;clearTimeout(timer);try{if(peer){peer.destroy();peer=null;}}catch(e){}onFail(err);}
+      const timer=setTimeout(()=>fail(new Error('timeout')),12000);
+      try{const opts={host,port,path,secure,config:ICE,debug:1};peer=id?new Peer(id,opts):new Peer(opts);}catch(e){fail(new Error(e.message));return;}
+      peer.on('open',pid=>{UI.finishConnProgress();UI.setConnStatus('connecting','📡 Connecté');ok(pid);});
+      peer.on('error',err=>{if(err.type==='unavailable-id')fail(new Error('HOST_MIGRATED'));else fail(new Error(err.type||'peer-error'));});
+      peer.on('disconnected',()=>{if(peer&&!settled)peer.reconnect();});
     }
-    return new Promise((resolve, reject) => {
-      tryServer(PEER_SERVER_HOST, 443, PEER_SERVER_PATH, true, resolve, err1 => {
-        if (err1 && err1.message === 'HOST_MIGRATED') { reject(err1); return; }
-        UI.setConnStatus('connecting', '📡 Serveur alternatif...');
-        tryServer(PEER_SERVER_HOST_FALLBACK, 443, PEER_SERVER_PATH_FALLBACK, true, resolve, err2 => {
-          reject(err2 && err2.message === 'HOST_MIGRATED' ? err2 : new Error('Serveur inaccessible'));
-        });
+    return new Promise((resolve,reject)=>{
+      tryServer(PEER_SERVER_HOST,443,PEER_SERVER_PATH,true,resolve,err1=>{
+        if(err1&&err1.message==='HOST_MIGRATED'){reject(err1);return;}
+        UI.setConnStatus('connecting','📡 Serveur alternatif...');
+        tryServer(PEER_SERVER_HOST_FB,443,PEER_SERVER_PATH_FB,true,resolve,err2=>{reject(err2&&err2.message==='HOST_MIGRATED'?err2:new Error('Serveur inaccessible'));});
       });
     });
   }
 
   function setupHostListeners() {
-    peer.on('connection', conn => {
-      conn.on('open', () => { conn.on('data', data => handleHostMessage(conn, data)); });
-      conn.on('close', () => handleDisconnect(conn.peer));
-      conn.on('error', e => console.warn('conn error', e));
+    peer.on('connection',conn=>{
+      conn.on('open',()=>{conn.on('data',data=>handleHostMessage(conn,data));});
+      conn.on('close',()=>handleDisconnect(conn.peer));
+      conn.on('error',e=>console.warn('conn err',e));
     });
   }
 
-  function handleHostMessage(conn, data) {
-    switch(data.type) {
-      case 'status_check': {
-        const status = !gameState ? 'unknown' : gameState.phase !== 'lobby' ? 'playing' : gameState.players.length >= MAX_PLAYERS ? 'full' : 'open';
-        try { conn.send({ type: 'status_response', status }); } catch(e) {}
-        break;
+  function handleHostMessage(conn,data) {
+    switch(data.type){
+      case 'status_check':{
+        const s=!gameState?'unknown':gameState.phase!=='lobby'?'playing':gameState.players.length>=MAX_PLAYERS?'full':'open';
+        try{conn.send({type:'status_response',status:s});}catch(e){}break;
       }
       case 'join':
-        if (!gameState) { conn.send({ type: 'error', msg: 'Salle non prête, réessayez' }); return; }
-        if (gameState.phase !== 'lobby') {
-          const dp = gameState.players.find(p => {
-            if (p.isBot || p.isHost) return false;
-            if (p.id === data.id || p.id === data.lastId) return true;
-            if (p.name === data.name) { const ec = connections[p.id]; return !ec || !ec.open || p.disconnected; }
-            return false;
-          });
-          if (dp) {
-            const oldId = dp.id, newId = conn.peer;
-            if (oldId !== newId) {
-              delete connections[oldId]; dp.id = newId;
-              if (gameState.hands && gameState.hands[oldId] !== undefined) { gameState.hands[newId] = gameState.hands[oldId]; delete gameState.hands[oldId]; }
-              if (gameState.totalScores && gameState.totalScores[oldId] !== undefined) { gameState.totalScores[newId] = gameState.totalScores[oldId]; delete gameState.totalScores[oldId]; }
-              if (gameState.dekalBy === oldId) gameState.dekalBy = newId;
-            }
-            connections[newId] = conn; dp.disconnected = false;
-            Network.broadcastToast(dp.name + ' est de retour !');
-            ActionLog.add('🔄 ' + dp.name + ' reconnecté');
-            try { conn.send({ type: 'approved', playerId: newId }); } catch(e) {}
-            Network.broadcastState(); return;
+        if(!gameState){conn.send({type:'error',msg:'Salle non prête'});return;}
+        if(gameState.phase!=='lobby'){
+          // Reconnexion
+          const dp=gameState.players.find(p=>{if(p.isBot||p.isHost)return false; if(p.id===data.id||p.id===data.lastId)return true; if(p.name===data.name){const ec=connections[p.id];return!ec||!ec.open||p.disconnected;} return false;});
+          if(dp){
+            const oldId=dp.id,newId=conn.peer;
+            if(oldId!==newId){delete connections[oldId];dp.id=newId;['grids','chosen','totalScores'].forEach(k=>{if(gameState[k]&&gameState[k][oldId]!==undefined){gameState[k][newId]=gameState[k][oldId];delete gameState[k][oldId];}});}
+            connections[newId]=conn;dp.disconnected=false;
+            Network.broadcastToast(dp.name+' est de retour !');
+            try{conn.send({type:'approved',playerId:newId});}catch(e){}
+            Network.broadcastState();return;
           }
-          conn.send({ type: 'rejected', msg: 'Partie en cours' }); return;
+          conn.send({type:'rejected',msg:'Partie en cours'});return;
         }
-        if (gameState.players.length >= MAX_PLAYERS) { conn.send({ type: 'rejected', msg: 'Salle pleine' }); return; }
-        // Approval flow
-        pendingRequests[conn.peer] = { conn, name: data.name, id: data.id };
-        try { conn.send({ type: 'pending' }); } catch(e) {}
-        renderJoinRequests(); break;
+        if(gameState.players.length>=MAX_PLAYERS){conn.send({type:'rejected',msg:'Salle pleine'});return;}
+        pendingRequests[conn.peer]={conn,name:data.name};
+        try{conn.send({type:'pending'});}catch(e){}
+        renderJoinRequests();break;
       case 'action':
-        if (conn.peer !== data.action?.playerId) handlePlayerAction(conn.peer, data.action);
-        else handlePlayerAction(conn.peer, data.action);
-        break;
-      default: break;
+        handlePlayerAction(conn.peer,data.action);break;
     }
   }
 
   function renderJoinRequests() {
-    const area = document.getElementById('join-requests-area'); if (!area) return;
-    const entries = Object.entries(pendingRequests);
-    if (entries.length === 0) { area.style.display = 'none'; area.innerHTML = ''; return; }
-    area.style.display = '';
-    area.innerHTML = '<p style="font-size:.78em;color:#aaa;margin-bottom:8px">Demandes d\'accès :</p>' +
-      entries.map(([pid, req]) => `<div class="join-request-item"><span class="join-request-name">${req.name}</span><div class="join-request-btns"><button onclick="Network.approveJoin('${pid}')">✅ Accepter</button><button class="reject-btn" onclick="Network.rejectJoin('${pid}')">✕ Refuser</button></div></div>`).join('');
+    const area=document.getElementById('join-requests-area');if(!area)return;
+    const entries=Object.entries(pendingRequests);
+    if(!entries.length){area.style.display='none';area.innerHTML='';return;}
+    area.style.display='';
+    area.innerHTML='<p style="font-size:.78em;color:#aaa;margin-bottom:8px">Demandes d\'accès :</p>'+entries.map(([pid,req])=>`<div class="join-request-item"><span class="join-request-name">${req.name}</span><div class="join-request-btns"><button onclick="Network.approveJoin('${pid}')">✅ Accepter</button><button class="reject-btn" onclick="Network.rejectJoin('${pid}')">✕ Refuser</button></div></div>`).join('');
   }
 
   function approveJoin(pid) {
-    const req = pendingRequests[pid]; if (!req) return;
+    const req=pendingRequests[pid];if(!req)return;
     delete pendingRequests[pid];
-    const newPlayer = { id: pid, name: req.name, isHost: false, isBot: false, disconnected: false };
-    gameState.players.push(newPlayer);
-    gameState.totalScores[pid] = 0;
-    connections[pid] = req.conn;
-    try { req.conn.send({ type: 'approved', playerId: pid }); } catch(e) {}
-    Network.broadcastState();
-    renderJoinRequests();
+    gameState.players.push({id:pid,name:req.name,isHost:false,isBot:false,disconnected:false});
+    gameState.totalScores[pid]=0;
+    connections[pid]=req.conn;
+    try{req.conn.send({type:'approved',playerId:pid});}catch(e){}
+    Network.broadcastState();renderJoinRequests();
   }
 
   function rejectJoin(pid) {
-    const req = pendingRequests[pid]; if (!req) return;
+    const req=pendingRequests[pid];if(!req)return;
     delete pendingRequests[pid];
-    try { req.conn.send({ type: 'rejected', msg: 'Accès refusé par l\'hôte' }); } catch(e) {}
+    try{req.conn.send({type:'rejected',msg:'Accès refusé'});}catch(e){}
     renderJoinRequests();
   }
 
   function handleDisconnect(peerId) {
-    if (!gameState) return;
-    const player = gameState.players.find(p => p.id === peerId);
-    if (!player) { delete connections[peerId]; return; }
-    player.disconnected = true;
-    delete connections[peerId];
-    Network.broadcastToast('⚠️ ' + player.name + ' déconnecté');
-    ActionLog.add('⚠️ ' + player.name + ' déconnecté');
+    if(!gameState)return;
+    const p=gameState.players.find(p=>p.id===peerId);
+    if(!p){delete connections[peerId];return;}
+    p.disconnected=true;delete connections[peerId];
+    Network.broadcastToast('⚠️ '+p.name+' déconnecté');
     Network.broadcastState();
-    clearTimeout(_hostMigrationTimer);
-    _hostMigrationTimer = setTimeout(() => Network.attemptHostMigration(), HOST_MIGRATION_DELAY_MS);
-  }
-
-  function attemptHostMigration() { /* same pattern as Skyjo — omitted for brevity, handled below */ }
-
-  let _reconnectTimer2 = null;
-  function tryReconnect() {
-    if (!roomCode) return;
-    reconnectAttempt++;
-    if (reconnectAttempt > 8) { UI.toast('Reconnexion échouée — retour au menu'); App.backToMenu(); return; }
-    UI.setConnStatus('reconnecting', '🔄 Reconnexion...');
-    const lastId = myPeerId;
-    Network.initPeer().then(pid => {
-      const conn = peer.connect('dekal' + roomCode, { reliable: true });
-      conn.on('open', () => {
-        hostConn = conn;
-        conn.on('data', handleClientMessage);
-        conn.on('close', () => { hostConn = null; scheduleReconnect(); });
-        conn.send({ type: 'join', name: myName, id: pid, lastId });
-        reconnectAttempt = 0;
-        UI.setConnStatus('connected', '');
-      });
-      conn.on('error', () => scheduleReconnect());
-      setTimeout(() => { if (!hostConn || !hostConn.open) scheduleReconnect(); }, 10000);
-    }).catch(() => scheduleReconnect());
-  }
-
-  function scheduleReconnect() {
-    const hasActive = (() => { try { return !!localStorage.getItem('dekal_activeRoom'); } catch(e) { return false; } })();
-    if (currentScreen === 'screen-menu' && !hasActive) return;
-    const delay = Math.min(2000 * reconnectAttempt, 8000);
-    reconnectTimer = setTimeout(tryReconnect, delay);
   }
 
   function handleClientMessage(data) {
-    switch(data.type) {
-      case 'state':
-        gameState = data.state;
-        if (gameState.players) {
-          let me = gameState.players.find(p => p.id === myPeerId);
-          if (!me && myName) me = gameState.players.find(p => p.name === myName && !p.isBot);
-          if (me) { myPlayerId = me.id; myPeerId = me.id; }
-        }
-        Render.fromState(); break;
-      case 'peer_list': _allPeerIds = data.peerIds || []; break;
-      case 'pending': showWaitingApproval(); break;
-      case 'approved': hideWaitingApproval(); UI.toast('✅ Vous avez été accepté !'); if (data.playerId) { myPlayerId = data.playerId; myPeerId = data.playerId; } break;
-      case 'rejected': hideWaitingApproval(); UI.toast('❌ ' + (data.msg || 'Accès refusé')); setTimeout(() => App.backToMenu(true), 1200); break;
-      case 'error': UI.toast(data.msg); break;
-      case 'toast': UI.toast(data.msg); break;
-      case 'log': ActionLog.add(data.msg); break;
-      case 'boom': triggerBoom(); Sound.play('boom'); break;
+    switch(data.type){
+      case 'state': gameState=data.state; if(gameState.players){let me=gameState.players.find(p=>p.id===myPeerId); if(!me&&myName)me=gameState.players.find(p=>p.name===myName&&!p.isBot); if(me){myPlayerId=me.id;myPeerId=me.id;}} Render.fromState();break;
+      case 'peer_list': _allPeerIds=data.peerIds||[];break;
+      case 'pending': showWaitingApproval();break;
+      case 'approved': hideWaitingApproval();UI.toast('✅ Vous avez été accepté !');if(data.playerId){myPlayerId=data.playerId;myPeerId=data.playerId;}break;
+      case 'rejected': hideWaitingApproval();UI.toast('❌ '+(data.msg||'Accès refusé'));setTimeout(()=>App.backToMenu(true),1200);break;
+      case 'error': UI.toast(data.msg);break;
+      case 'toast': UI.toast(data.msg);break;
+      case 'log': ActionLog.add(data.msg);break;
+      case 'boom': triggerBoom();break;
     }
   }
 
-  function broadcast(msg) { Object.values(connections).forEach(conn => { try { conn.send(msg); } catch(e) {} }); }
-  function broadcastState() {
-    const s = Object.assign({}, gameState); delete s.deck;
-    broadcast({ type: 'state', state: s });
-    broadcastPeerList();
-    Render.fromState();
-    setTimeout(() => Bot.maybePlay(), 50);
+  function tryReconnect() {
+    if(!roomCode)return;
+    reconnectAttempt++;
+    if(reconnectAttempt>8){UI.toast('Reconnexion échouée');App.backToMenu();return;}
+    UI.setConnStatus('reconnecting','🔄 Reconnexion...');
+    const lastId=myPeerId;
+    Network.initPeer().then(pid=>{
+      const conn=peer.connect('dekal'+roomCode,{reliable:true});
+      conn.on('open',()=>{ hostConn=conn; conn.on('data',handleClientMessage); conn.on('close',()=>{hostConn=null;scheduleReconnect();}); conn.send({type:'join',name:myName,id:pid,lastId}); reconnectAttempt=0; UI.setConnStatus('connected',''); });
+      conn.on('error',()=>scheduleReconnect());
+      setTimeout(()=>{if(!hostConn||!hostConn.open)scheduleReconnect();},10000);
+    }).catch(()=>scheduleReconnect());
   }
-  function broadcastToast(msg) { broadcast({ type: 'toast', msg }); UI.toast(msg); }
-  function broadcastLog(msg) { broadcast({ type: 'log', msg }); ActionLog.add(msg); }
-  function broadcastBoom() { broadcast({ type: 'boom' }); triggerBoom(); Sound.play('boom'); }
-  function broadcastPeerList() { const ids = [myPlayerId, ...Object.keys(connections)].filter(Boolean); broadcast({ type: 'peer_list', peerIds: ids, roomCode }); }
-  function sendToHost(data) { if (hostConn && hostConn.open) hostConn.send(data); }
-  function generateRoomCode() { const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let c = ''; for (let i = 0; i < 5; i++) c += chars[Math.floor(Math.random() * chars.length)]; return c; }
 
-  return { initPeer, setupHostListeners, tryReconnect, scheduleReconnect, attemptHostMigration,
-    broadcastState, broadcastToast, broadcastLog, broadcastBoom, broadcastPeerList,
-    sendToHost, generateRoomCode, approveJoin, rejectJoin,
-    handleClientMessage,
-    isPending: id => !!pendingRequests[id],
-    removePending: id => { delete pendingRequests[id]; renderJoinRequests(); }
-  };
+  function scheduleReconnect() {
+    const has=()=>{try{return!!localStorage.getItem('dekal_activeRoom');}catch(e){return false;}};
+    if(currentScreen==='screen-menu'&&!has())return;
+    reconnectTimer=setTimeout(tryReconnect,Math.min(2000*reconnectAttempt,8000));
+  }
+
+  function broadcast(msg){Object.values(connections).forEach(c=>{try{c.send(msg);}catch(e){}});}
+  function broadcastState(){const s=Object.assign({},gameState);delete s.deck;broadcast({type:'state',state:s});broadcast({type:'peer_list',peerIds:[myPlayerId,...Object.keys(connections)].filter(Boolean),roomCode});Render.fromState();setTimeout(()=>Bot.maybePlay(),50);}
+  function broadcastToast(msg){broadcast({type:'toast',msg});UI.toast(msg);}
+  function broadcastLog(msg){broadcast({type:'log',msg});ActionLog.add(msg);}
+  function broadcastBoom(){broadcast({type:'boom'});triggerBoom();}
+  function sendToHost(data){if(hostConn&&hostConn.open)hostConn.send(data);}
+  function generateRoomCode(){const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let r='';for(let i=0;i<5;i++)r+=c[Math.floor(Math.random()*c.length)];return r;}
+  function attemptHostMigration(){}
+
+  return {initPeer,setupHostListeners,tryReconnect,scheduleReconnect,attemptHostMigration,broadcastState,broadcastToast,broadcastLog,broadcastBoom,sendToHost,generateRoomCode,approveJoin,rejectJoin,handleClientMessage,isPending:id=>!!pendingRequests[id],removePending:id=>{delete pendingRequests[id];renderJoinRequests();}};
 })();
 
-// Alias global pour joinGame
-function _handleClientMsg(data) { Network.handleClientMessage(data); }
-
-// ============================================================
-// 9. GAME LOGIC — Règles Dékal
-// ============================================================
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i+1)); [a[i],a[j]] = [a[j],a[i]]; }
-  return a;
-}
-
-function createDeck() {
-  const suits = ['♥','♦','♣','♠'];
-  const ranks = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
-  const deck = [];
-  suits.forEach(s => ranks.forEach(r => deck.push({ rank: r, suit: s })));
-  deck.push({ rank: 'JK', suit: '🃏' }); // joker 1
-  deck.push({ rank: 'JK', suit: '🃏' }); // joker 2
-  return shuffle(deck);
-}
+// ── GAME LOGIC ──
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 
 function initRound() {
-  const deck = createDeck();
-  const hands = {};
+  const deck = createDekDeck();
+  const grids = {}, chosen = {};
   gameState.players.forEach(p => {
-    const hand = [];
-    for (let i = 0; i < HAND_SIZE; i++) hand.push(deck.pop());
-    hands[p.id] = hand;
+    const g = [];
+    for (let r = 0; r < GRID; r++) {
+      const row = [];
+      for (let c = 0; c < GRID; c++) row.push({ v: deck.pop(), revealed: false });
+      g.push(row);
+    }
+    grids[p.id] = g;
+    chosen[p.id] = null; // carte choisie ce tour
   });
-  const discardTop = deck.pop();
-  gameState.round++;
   gameState.phase = 'playing';
-  gameState.deck = deck;
-  gameState.discard = [discardTop];
-  gameState.hands = hands;
-  gameState.currentPlayerIndex = 0;
-  gameState.turnPhase = 'draw'; // 'draw' | 'held' (card drawn, decide swap or discard)
-  gameState.drawnCard = null;
-  gameState.drawnFrom = null;
-  gameState.dekalBy = null;        // playerId who said Dékal
-  gameState.dekalTurnsLeft = -1;   // countdown after Dékal
-  gameState.roundScores = {};
+  gameState.turn = 0;           // 0..15
+  gameState.subPhase = 'choose'; // 'choose' | 'dekal_picks' | 'others_push' | 'push_mine'
+  gameState.dekalIdx = 0;       // index du joueur avec le pion
+  gameState.centerCards = [];   // [{playerId, row, col, v}]
+  gameState.pushQueue = [];     // ordre des joueurs qui doivent pousser
+  gameState.pushQueueIdx = 0;
+  gameState.grids = grids;
+  gameState.chosen = chosen;
+  gameState.chosenCount = 0;
   ActionLog.clear();
-  Network.broadcastToast('Manche ' + gameState.round + ' — En selle !');
+  Network.broadcastToast('Manche — Choisissez une carte !');
   Network.broadcastState();
-  setTimeout(() => Bot.maybePlay(), 100);
+  setTimeout(() => Bot.maybePlay(), 200);
 }
 
 function performAction(action) {
@@ -1067,230 +775,357 @@ function performAction(action) {
 }
 
 function handlePlayerAction(playerId, action) {
-  if (!isHost || !gameState) return;
-  if (gameState.phase !== 'playing') return;
-  const cp = gameState.players[gameState.currentPlayerIndex];
-  if (!cp || cp.id !== playerId) return; // only current player
+  if (!isHost || !gameState || gameState.phase !== 'playing') return;
 
-  switch(action.type) {
-    case 'draw_deck': {
-      if (gameState.turnPhase !== 'draw') return;
-      if (gameState.deck.length === 0) reshuffleDeck();
-      gameState.drawnCard = gameState.deck.pop();
-      gameState.drawnFrom = 'deck';
-      gameState.turnPhase = 'held';
-      Network.broadcastLog('🃏 ' + getPlayerName(playerId) + ' pioche');
+  switch (action.type) {
+
+    case 'choose_card': {
+      // Phase 'choose' : chaque joueur choisit 1 carte face cachée
+      if (gameState.subPhase !== 'choose') return;
+      if (gameState.chosen[playerId]) return; // déjà choisi
+      const { row, col } = action;
+      const cell = gameState.grids[playerId][row][col];
+      if (!cell || cell.revealed) return; // doit être face cachée
+      gameState.chosen[playerId] = { row, col, v: cell.v };
+      gameState.chosenCount = (gameState.chosenCount || 0) + 1;
+      Network.broadcastLog('🃏 ' + getPlayerName(playerId) + ' choisit sa carte');
+      // Vérifier si tout le monde a choisi
+      const allChosen = gameState.players.every(p => !!gameState.chosen[p.id]);
+      if (allChosen) {
+        // Révélation simultanée → construire centerCards
+        gameState.centerCards = gameState.players.map(p => ({
+          playerId: p.id,
+          row: gameState.chosen[p.id].row,
+          col: gameState.chosen[p.id].col,
+          v: gameState.chosen[p.id].v
+        }));
+        // Retirer les cartes des grilles (elles sont au centre)
+        gameState.players.forEach(p => {
+          const ch = gameState.chosen[p.id];
+          gameState.grids[p.id][ch.row][ch.col] = null; // slot vide
+        });
+        gameState.subPhase = 'dekal_picks';
+        Network.broadcastToast('🏅 ' + getPlayerName(gameState.players[gameState.dekalIdx].id) + ' choisit une carte !');
+        Network.broadcastLog('👀 Révélation ! ' + gameState.centerCards.map(c => c.v).join(', '));
+      }
       Network.broadcastState();
+      setTimeout(() => Bot.maybePlay(), 100);
       break;
     }
-    case 'draw_discard': {
-      if (gameState.turnPhase !== 'draw') return;
-      if (gameState.discard.length === 0) return;
-      gameState.drawnCard = gameState.discard.pop();
-      gameState.drawnFrom = 'discard';
-      gameState.turnPhase = 'held';
-      Network.broadcastLog('♻️ ' + getPlayerName(playerId) + ' prend ' + cardLabel(gameState.drawnCard));
+
+    case 'pick_center': {
+      // Le joueur Dékal (et ensuite les autres dans l'ordre) choisit une carte du centre
+      if (gameState.subPhase !== 'dekal_picks' && gameState.subPhase !== 'others_push') return;
+      const dekalPlayerId = gameState.players[gameState.dekalIdx].id;
+      if (gameState.subPhase === 'dekal_picks' && playerId !== dekalPlayerId) return;
+      if (gameState.subPhase === 'others_push') {
+        // Vérifier que c'est bien ce joueur's turn in push queue
+        const expectedId = gameState.pushQueue[gameState.pushQueueIdx];
+        if (playerId !== expectedId) return;
+      }
+      const { centerIdx } = action;
+      if (centerIdx < 0 || centerIdx >= gameState.centerCards.length) return;
+      const pickedCard = gameState.centerCards[centerIdx];
+      gameState.centerCards.splice(centerIdx, 1);
+      gameState.pendingCard = { playerId, v: pickedCard.v }; // carte à insérer
+      gameState.subPhase = 'push_mine';
+      Network.broadcastLog('✋ ' + getPlayerName(playerId) + ' prend le ' + pickedCard.v);
       Network.broadcastState();
+      setTimeout(() => Bot.maybePlay(), 100);
       break;
     }
-    case 'swap_card': {
-      if (gameState.turnPhase !== 'held') return;
-      const { idx } = action;
-      if (idx < 0 || idx >= HAND_SIZE) return;
-      const oldCard = gameState.hands[playerId][idx];
-      gameState.hands[playerId][idx] = gameState.drawnCard;
-      gameState.discard.push(oldCard);
-      Network.broadcastLog('🔄 ' + getPlayerName(playerId) + ' échange → défausse ' + cardLabel(oldCard));
-      Sound.play('swap');
-      gameState.drawnCard = null;
-      gameState.drawnFrom = null;
-      endTurn(playerId);
-      break;
-    }
-    case 'discard_drawn': {
-      if (gameState.turnPhase !== 'held') return;
-      gameState.discard.push(gameState.drawnCard);
-      Network.broadcastLog('🗑 ' + getPlayerName(playerId) + ' défausse ' + cardLabel(gameState.drawnCard));
-      gameState.drawnCard = null;
-      gameState.drawnFrom = null;
-      endTurn(playerId);
-      break;
-    }
-    case 'say_dekal': {
-      // Can be said at any held/post-action moment — for simplicity allow after swap/discard as a combined action
-      if (gameState.dekalBy) return; // already said
-      gameState.dekalBy = playerId;
-      gameState.dekalTurnsLeft = gameState.players.length - 1;
-      Network.broadcastToast('🎉 DÉKAL ! ' + getPlayerName(playerId) + ' clôture la manche !');
-      ActionLog.add('🎉 DÉKAL par ' + getPlayerName(playerId));
-      Sound.play('dekal');
-      // Do NOT endTurn here — the declaring player has already acted
-      Network.broadcastState();
+
+    case 'push_card': {
+      // Insérer la carte en poussant une ligne/colonne
+      if (gameState.subPhase !== 'push_mine') return;
+      if (!gameState.pendingCard || gameState.pendingCard.playerId !== playerId) return;
+      const { dir, idx } = action; // dir: 'row_left'|'row_right'|'col_up'|'col_down', idx: 0-3
+      const grid = gameState.grids[playerId];
+      const v = gameState.pendingCard.v;
+      let ejected = null;
+
+      if (dir === 'row_right') {
+        // Insérer à gauche, pousse vers la droite, éjecte à droite
+        ejected = grid[idx][GRID - 1];
+        for (let c = GRID - 1; c > 0; c--) grid[idx][c] = grid[idx][c - 1];
+        grid[idx][0] = { v, revealed: true };
+      } else if (dir === 'row_left') {
+        ejected = grid[idx][0];
+        for (let c = 0; c < GRID - 1; c++) grid[idx][c] = grid[idx][c + 1];
+        grid[idx][GRID - 1] = { v, revealed: true };
+      } else if (dir === 'col_down') {
+        ejected = grid[GRID - 1][idx];
+        for (let r = GRID - 1; r > 0; r--) grid[r][idx] = grid[r - 1][idx];
+        grid[0][idx] = { v, revealed: true };
+      } else if (dir === 'col_up') {
+        ejected = grid[0][idx];
+        for (let r = 0; r < GRID - 1; r++) grid[r][idx] = grid[r + 1][idx];
+        grid[GRID - 1][idx] = { v, revealed: true };
+      }
+
+      // Handle null slots (where chosen card was removed) — move nulls along too, they just disappear
+      // Clean up: if any null cell resulted from the push, it means the empty slot was pushed out
+      // Actually the null slot is filled by the push, the null "falls off" harmlessly
+      // Remove any remaining null in that row/col (should be at most 1)
+      if (dir === 'row_right' || dir === 'row_left') {
+        for (let c = 0; c < GRID; c++) if (grid[idx][c] === null) { grid[idx][c] = { v: 0, revealed: false }; /* shouldn't happen */ }
+      } else {
+        for (let r = 0; r < GRID; r++) if (grid[r][idx] === null) { grid[r][idx] = { v: 0, revealed: false }; }
+      }
+
+      gameState.pendingCard = null;
+      Network.broadcastLog('➡️ ' + getPlayerName(playerId) + ' insère ' + v + (ejected ? ' (éjecte ' + (ejected.v || '?') + ')' : ''));
+      Sound.play('push');
+
+      // Advance to next player in queue or end turn
+      advancePushQueue();
       break;
     }
   }
 }
 
-function reshuffleDeck() {
-  if (gameState.discard.length <= 1) return;
-  const top = gameState.discard.pop();
-  gameState.deck = shuffle(gameState.discard);
-  gameState.discard = [top];
+function advancePushQueue() {
+  if (gameState.subPhase === 'push_mine') {
+    // Just finished a push — determine next step
+    if (gameState.centerCards.length === 0) {
+      // All cards picked — end of turn
+      endTurn();
+    } else {
+      // Still cards in center — build/advance push queue
+      if (!gameState.pushQueue || gameState.pushQueueIdx === undefined) {
+        // Build queue: all players except dekalIdx, in rotation order
+        const dekalI = gameState.dekalIdx;
+        const queue = [];
+        for (let i = 1; i < gameState.players.length; i++) {
+          queue.push(gameState.players[(dekalI + i) % gameState.players.length].id);
+        }
+        gameState.pushQueue = queue;
+        gameState.pushQueueIdx = 0;
+      } else {
+        gameState.pushQueueIdx++;
+      }
+      if (gameState.pushQueueIdx >= gameState.pushQueue.length) {
+        endTurn();
+        return;
+      }
+      gameState.subPhase = 'others_push';
+    }
+    Network.broadcastState();
+    setTimeout(() => Bot.maybePlay(), 100);
+  }
 }
 
-function endTurn(playerId) {
-  // If Dékal was said and this was the last extra turn, end round
-  if (gameState.dekalBy) {
-    gameState.dekalTurnsLeft--;
-    if (gameState.dekalTurnsLeft <= 0) {
-      endRound(); return;
-    }
+function endTurn() {
+  gameState.turn++;
+  gameState.subPhase = 'choose';
+  gameState.centerCards = [];
+  gameState.chosen = {};
+  gameState.pushQueue = [];
+  gameState.pushQueueIdx = 0;
+  gameState.pendingCard = null;
+  gameState.chosenCount = 0;
+  // Pion passe au joueur suivant
+  gameState.dekalIdx = (gameState.dekalIdx + 1) % gameState.players.length;
+
+  if (gameState.turn >= TOTAL_TURNS) {
+    endGame();
+    return;
   }
-  // Advance to next player
-  gameState.currentPlayerIndex = (gameState.currentPlayerIndex + 1) % gameState.players.length;
-  gameState.turnPhase = 'draw';
-  gameState.drawnCard = null;
-  gameState.drawnFrom = null;
+
+  Network.broadcastToast('Tour ' + (gameState.turn + 1) + '/16 — ' + getPlayerName(gameState.players[gameState.dekalIdx].id) + ' a le pion !');
   Network.broadcastState();
+  setTimeout(() => Bot.maybePlay(), 200);
 }
 
-function calcHandScore(playerId) {
-  return (gameState.hands[playerId] || []).reduce((sum, c) => sum + cardValue(c.rank), 0);
-}
-
-function endRound() {
-  gameState.phase = 'round_end';
-  // Calculate scores
-  const scores = {};
-  gameState.players.forEach(p => { scores[p.id] = calcHandScore(p.id); });
-
-  // Check Dékal penalty: declarer must have the lowest score
-  const dekalScore = scores[gameState.dekalBy];
-  const minOther = Math.min(...gameState.players.filter(p => p.id !== gameState.dekalBy).map(p => scores[p.id]));
-  if (dekalScore > minOther || dekalScore === minOther) {
-    scores[gameState.dekalBy] *= 2;
-    Network.broadcastToast('💀 ' + getPlayerName(gameState.dekalBy) + ' pénalité Dékal — score doublé !');
-  }
-
-  gameState.roundScores = scores;
+function endGame() {
+  // Révéler toutes les cartes
   gameState.players.forEach(p => {
-    gameState.totalScores[p.id] = (gameState.totalScores[p.id] || 0) + (scores[p.id] || 0);
+    const g = gameState.grids[p.id];
+    for (let r = 0; r < GRID; r++)
+      for (let c = 0; c < GRID; c++)
+        if (g[r][c]) g[r][c].revealed = true;
   });
 
-  // Check game over
-  const ts = gameState.targetScore || END_SCORE;
-  if (gameState.players.some(p => (gameState.totalScores[p.id] || 0) >= ts)) {
-    gameState.phase = 'game_over';
-    const sorted = [...gameState.players].sort((a, b) => (gameState.totalScores[a.id]||0) - (gameState.totalScores[b.id]||0));
-    gameState.players.forEach(p => Leaderboard.update(p.name, p.id === sorted[0].id));
-    try { localStorage.removeItem('dekal_activeRoom'); } catch(e) {}
-  }
-  Network.broadcastState();
+  // Annuler les cartes adjacentes de même valeur
+  gameState.players.forEach(p => {
+    const g = gameState.grids[p.id];
+    let changed = true;
+    while (changed) {
+      changed = false;
+      const toAnnul = new Set();
+      for (let r = 0; r < GRID; r++) {
+        for (let c = 0; c < GRID; c++) {
+          if (!g[r][c]) continue;
+          const v = g[r][c].v;
+          // Vérifier droite
+          if (c + 1 < GRID && g[r][c+1] && g[r][c+1].v === v) { toAnnul.add(`${r},${c}`); toAnnul.add(`${r},${c+1}`); }
+          // Vérifier bas
+          if (r + 1 < GRID && g[r+1][c] && g[r+1][c].v === v) { toAnnul.add(`${r},${c}`); toAnnul.add(`${r+1},${c}`); }
+        }
+      }
+      if (toAnnul.size) {
+        changed = true;
+        toAnnul.forEach(k => { const [r,c] = k.split(',').map(Number); g[r][c] = { v: 0, revealed: true, annulled: true }; });
+        // Remove annulled
+        for (let r = 0; r < GRID; r++)
+          for (let c = 0; c < GRID; c++)
+            if (g[r][c] && g[r][c].annulled) g[r][c] = null;
+      }
+    }
+  });
+
+  // Calculer les scores
+  const scores = {};
+  gameState.players.forEach(p => {
+    let s = 0;
+    for (let r = 0; r < GRID; r++)
+      for (let c = 0; c < GRID; c++)
+        if (gameState.grids[p.id][r][c]) s += gameState.grids[p.id][r][c].v;
+    scores[p.id] = s;
+    gameState.totalScores[p.id] = (gameState.totalScores[p.id] || 0) + s;
+  });
+  gameState.roundScores = scores;
+  gameState.phase = 'game_over';
+
+  const sorted = [...gameState.players].sort((a, b) => (scores[a.id] || 0) - (scores[b.id] || 0));
+  gameState.players.forEach(p => Leaderboard.update(p.name, p.id === sorted[0].id));
+  try { localStorage.removeItem('dekal_activeRoom'); } catch(e) {}
+
   Sound.play('win');
+  Network.broadcastState();
 }
 
-function getPlayerName(pid) {
-  const p = (gameState?.players || []).find(pl => pl.id === pid);
-  return p ? p.name : '?';
-}
+function getPlayerName(pid) { return (gameState?.players || []).find(p => p.id === pid)?.name || '?'; }
 
-// ============================================================
-// 9.5. BOT AI — Intelligence artificielle (mode solo)
-// ============================================================
+// ── BOT AI ──
 const Bot = (() => {
   let _timer = null;
-  const TURN_START_DELAY = 600;
-
   function clearTimers() { clearTimeout(_timer); }
-
-  function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+  const delay = ms => new Promise(r => setTimeout(r, ms));
 
   async function maybePlay() {
     if (!isHost || !gameState || gameState.phase !== 'playing') return;
-    const cp = gameState.players[gameState.currentPlayerIndex];
-    if (!cp || !cp.isBot) return;
+    const sub = gameState.subPhase;
 
+    // Phase choose : bots choisissent une carte
+    if (sub === 'choose') {
+      for (const p of gameState.players) {
+        if (!p.isBot || gameState.chosen[p.id]) continue;
+        await delay(400 + Math.random() * 400);
+        if (!gameState || gameState.subPhase !== 'choose') return;
+        botChooseCard(p.id);
+      }
+      return;
+    }
+
+    // Phase dekal_picks ou others_push : bot qui doit choisir au centre
+    if (sub === 'dekal_picks') {
+      const dp = gameState.players[gameState.dekalIdx];
+      if (!dp.isBot) return;
+      await delay(600);
+      if (!gameState || gameState.subPhase !== 'dekal_picks') return;
+      botPickCenter(dp.id);
+      return;
+    }
+    if (sub === 'others_push') {
+      const eid = gameState.pushQueue?.[gameState.pushQueueIdx];
+      const ep = gameState.players.find(p => p.id === eid);
+      if (!ep || !ep.isBot) return;
+      await delay(500);
+      if (!gameState || gameState.subPhase !== 'others_push') return;
+      botPickCenter(ep.id);
+      return;
+    }
+
+    // Phase push_mine : bot pousse
+    if (sub === 'push_mine' && gameState.pendingCard) {
+      const pp = gameState.players.find(p => p.id === gameState.pendingCard.playerId);
+      if (!pp || !pp.isBot) return;
+      await delay(500);
+      if (!gameState || gameState.subPhase !== 'push_mine') return;
+      botPush(pp.id);
+    }
+  }
+
+  function botChooseCard(botId) {
+    const g = gameState.grids[botId];
+    const hidden = [];
+    for (let r = 0; r < GRID; r++)
+      for (let c = 0; c < GRID; c++)
+        if (g[r][c] && !g[r][c].revealed) hidden.push({ row: r, col: c });
+    if (!hidden.length) return;
+    const pick = hidden[Math.floor(Math.random() * hidden.length)];
+    handlePlayerAction(botId, { type: 'choose_card', row: pick.row, col: pick.col });
+  }
+
+  function botPickCenter(botId) {
+    if (!gameState.centerCards.length) return;
     const diff = gameState.botDifficulty || 'moyen';
-    const thinkMs = diff === 'facile' ? 1200 : diff === 'moyen' ? 800 : 400;
-
-    if (gameState.turnPhase === 'draw') {
-      await delay(TURN_START_DELAY + thinkMs);
-      if (!gameState?.players[gameState.currentPlayerIndex]?.isBot) return;
-      botDraw(cp.id, diff);
-    } else if (gameState.turnPhase === 'held') {
-      await delay(thinkMs * 0.7);
-      if (!gameState?.players[gameState.currentPlayerIndex]?.isBot) return;
-      botDecide(cp.id, diff);
-    }
-  }
-
-  function botDraw(botId, diff) {
-    const discardTop = gameState.discard.length > 0 ? gameState.discard[gameState.discard.length - 1] : null;
-    let takeDiscard = false;
-    if (discardTop) {
-      const worstInHand = Math.max(...gameState.hands[botId].map(c => cardValue(c.rank)));
-      if (diff === 'facile') takeDiscard = Math.random() < 0.3;
-      else if (diff === 'moyen') takeDiscard = cardValue(discardTop.rank) <= 4;
-      else takeDiscard = cardValue(discardTop.rank) < worstInHand && cardValue(discardTop.rank) <= 6;
-    }
-    handlePlayerAction(botId, { type: takeDiscard ? 'draw_discard' : 'draw_deck' });
-    setTimeout(() => maybePlay(), 50);
-  }
-
-  function botDecide(botId, diff) {
-    const drawn = gameState.drawnCard;
-    const hand = gameState.hands[botId];
-    const drawnVal = cardValue(drawn.rank);
-    // Find worst card in hand
-    let worstIdx = 0, worstVal = -1;
-    hand.forEach((c, i) => { const v = cardValue(c.rank); if (v > worstVal) { worstVal = v; worstIdx = i; } });
-
-    let shouldSwap = false;
-    if (diff === 'facile') shouldSwap = Math.random() < 0.5;
-    else if (diff === 'moyen') shouldSwap = drawnVal < worstVal && drawnVal <= 7;
-    else shouldSwap = drawnVal < worstVal;
-
-    if (shouldSwap) {
-      handlePlayerAction(botId, { type: 'swap_card', idx: worstIdx });
+    let bestIdx = 0;
+    if (diff !== 'facile') {
+      // Pick lowest value card
+      let minV = Infinity;
+      gameState.centerCards.forEach((c, i) => { if (c.v < minV) { minV = c.v; bestIdx = i; } });
     } else {
-      handlePlayerAction(botId, { type: 'discard_drawn' });
+      bestIdx = Math.floor(Math.random() * gameState.centerCards.length);
+    }
+    handlePlayerAction(botId, { type: 'pick_center', centerIdx: bestIdx });
+  }
+
+  function botPush(botId) {
+    const v = gameState.pendingCard.v;
+    const g = gameState.grids[botId];
+    const diff = gameState.botDifficulty || 'moyen';
+
+    if (diff === 'facile') {
+      // Random valid push
+      const dirs = ['row_right','row_left','col_down','col_up'];
+      handlePlayerAction(botId, { type: 'push_card', dir: dirs[Math.floor(Math.random() * 4)], idx: Math.floor(Math.random() * GRID) });
+      return;
     }
 
-    // Bot says Dékal if hand score is low enough
-    const handScore = calcHandScore(botId);
-    const shouldDekal = !gameState.dekalBy && (
-      diff === 'facile' ? handScore <= 8 :
-      diff === 'moyen'  ? handScore <= 12 :
-                          handScore <= 15
-    ) && Math.random() < 0.7;
-    if (shouldDekal) {
-      setTimeout(() => {
-        if (!gameState.dekalBy) handlePlayerAction(botId, { type: 'say_dekal' });
-      }, 300);
+    // Find the row/col with the highest current sum — push that one out
+    let bestDir = 'row_left', bestIdx = 0, bestScore = -1;
+    for (let i = 0; i < GRID; i++) {
+      // Row sum (eject rightmost going left, or leftmost going right)
+      const rowSum = [0,1,2,3].reduce((s, c) => s + (g[i][c]?.v || 0), 0);
+      const colSum = [0,1,2,3].reduce((s, r) => s + (g[r][i]?.v || 0), 0);
+      // Prefer to eject highest-value card
+      const rightEject = g[i][GRID-1]?.v || 0;
+      const leftEject = g[i][0]?.v || 0;
+      const botEject = g[GRID-1][i]?.v || 0;
+      const topEject = g[0][i]?.v || 0;
+      [
+        { dir: 'row_left',  idx: i, gain: rightEject - v },
+        { dir: 'row_right', idx: i, gain: leftEject - v },
+        { dir: 'col_up',    idx: i, gain: botEject - v },
+        { dir: 'col_down',  idx: i, gain: topEject - v },
+      ].forEach(opt => { if (opt.gain > bestScore) { bestScore = opt.gain; bestDir = opt.dir; bestIdx = opt.idx; } });
     }
+    handlePlayerAction(botId, { type: 'push_card', dir: bestDir, idx: bestIdx });
   }
 
   return { maybePlay, clearTimers };
 })();
 
-// ============================================================
-// 10. RENDER — Rendu DOM depuis le gameState
-// ============================================================
+// ── RENDER ──
 const Render = (() => {
-
   function fromState() {
     if (!gameState) return;
-    if (gameState.phase === 'playing') {
-      const cp = gameState.players[gameState.currentPlayerIndex];
-      if (cp && cp.id === myPlayerId && gameState.turnPhase === 'draw') Notif.notifyMyTurn();
-    }
-    switch(gameState.phase) {
-      case 'lobby': UI.showScreen('screen-lobby'); document.getElementById('lobby-code').textContent = roomCode; renderLobby(); break;
-      case 'playing': UI.showScreen('screen-game'); scheduleRender(); break;
-      case 'round_end':
-        UI.showScreen('screen-round-scores'); renderRoundScores();
-        document.getElementById('next-round-btn').style.display = isHost ? '' : 'none'; break;
-      case 'game_over': UI.showScreen('screen-final-scores'); renderFinalScores(); Sound.play('win'); break;
+    switch (gameState.phase) {
+      case 'lobby':
+        UI.showScreen('screen-lobby');
+        document.getElementById('lobby-code').textContent = roomCode;
+        renderLobby();
+        break;
+      case 'playing':
+        UI.showScreen('screen-game');
+        scheduleRender();
+        break;
+      case 'game_over':
+        UI.showScreen('screen-round-scores');
+        renderScores();
+        break;
     }
   }
 
@@ -1298,304 +1133,269 @@ const Render = (() => {
     if (!gameState) return;
     const isSolo = gameState.isSolo;
     document.getElementById('lobby-title').textContent = isSolo ? 'Partie Solo' : 'Salle d\'attente';
-    document.getElementById('lobby-subtitle').textContent = isSolo ? 'Prêt à jouer contre le bot ?' : 'Partagez le code ou le QR code';
+    document.getElementById('lobby-subtitle').textContent = isSolo ? 'Prêt à jouer ?' : 'Partagez le code ou le QR code';
     document.getElementById('lobby-solo-info').style.display = isSolo ? '' : 'none';
     document.getElementById('lobby-multi-info').style.display = isSolo ? 'none' : '';
     const list = document.getElementById('lobby-players');
     list.innerHTML = gameState.players.map(p => {
       const badge = p.isHost ? '<span class="host-badge">HÔTE</span>' : (p.isBot ? '<span class="host-badge" style="background:#27ae60">🤖 BOT</span>' : '');
       const me = p.id === myPlayerId ? ' (vous)' : '';
-      const kickBtn = (isHost && !p.isHost && !p.isBot) ? `<button class="kick-btn" onclick="App.kickPlayer('${p.id}')">✕ Expulser</button>` : '';
-      return `<li>${p.name}${me} ${badge}${kickBtn}</li>`;
+      const kick = (isHost && !p.isHost && !p.isBot) ? `<button class="kick-btn" onclick="App.kickPlayer('${p.id}')">✕</button>` : '';
+      return `<li>${p.name}${me} ${badge}${kick}</li>`;
     }).join('');
     const sb = document.getElementById('start-btn');
     sb.style.display = (isHost && gameState.players.length >= 2) ? '' : 'none';
-    sb.textContent = isSolo ? 'Jouer !' : 'Lancer la partie';
+    sb.textContent = isSolo ? 'Jouer !' : 'Lancer';
   }
 
-  let _renderPending = false;
+  let _rPending = false;
   function scheduleRender() {
-    if (_renderPending) return; _renderPending = true;
-    requestAnimationFrame(() => { _renderPending = false; renderGame(); });
+    if (_rPending) return; _rPending = true;
+    requestAnimationFrame(() => { _rPending = false; renderGame(); });
   }
 
   function renderGame() {
-    const pilesArea = document.getElementById('piles-area');
-    const playersArea = document.getElementById('players-area');
-    const actionBar = document.getElementById('action-bar');
-    const statusEl = document.getElementById('game-status');
     const roundEl = document.getElementById('round-info');
+    const statusEl = document.getElementById('game-status');
+    const playersArea = document.getElementById('players-area');
+    const centerArea = document.getElementById('center-area');
+    const actionBar = document.getElementById('action-bar');
 
-    const ts = gameState.targetScore || END_SCORE;
-    roundEl.textContent = 'Manche ' + gameState.round + '  ·  🎯 ' + ts + ' pts';
+    const turn = (gameState.turn || 0);
+    const dekalPlayer = gameState.players[gameState.dekalIdx];
+    roundEl.textContent = 'Tour ' + (turn + 1) + '/' + TOTAL_TURNS + '  ·  🏅 ' + (dekalPlayer?.name || '?');
 
-    const isMyTurn = gameState.players[gameState.currentPlayerIndex]?.id === myPlayerId;
-    const cp = gameState.players[gameState.currentPlayerIndex];
+    const sub = gameState.subPhase;
+    const iAmDekal = dekalPlayer?.id === myPlayerId;
+    const iAmInPushQueue = sub === 'others_push' && gameState.pushQueue?.[gameState.pushQueueIdx] === myPlayerId;
+    const iAmPushing = sub === 'push_mine' && gameState.pendingCard?.playerId === myPlayerId;
+    const myChosen = gameState.chosen?.[myPlayerId];
 
     // Status
-    if (isMyTurn) {
-      switch(gameState.turnPhase) {
-        case 'draw': statusEl.textContent = '🃏 Piochez une carte'; break;
-        case 'held': statusEl.textContent = '🔄 Échangez ou défaussez — ' + cardLabel(gameState.drawnCard); break;
-        default: statusEl.textContent = 'À vous de jouer';
-      }
-    } else {
-      statusEl.textContent = 'Tour de ' + (cp?.name || '?') + (cp?.disconnected ? ' ⚠️' : '');
-    }
-    if (gameState.dekalBy) {
-      statusEl.textContent += ' 🎉 DÉKAL en cours !';
-    }
-
-    // Piles
-    const discardTop = gameState.discard?.length > 0 ? gameState.discard[gameState.discard.length - 1] : null;
-    const deckCount = gameState.deck ? gameState.deck.length : '?';
-    let pilesHtml = `
-      <div class="pile">
-        <div class="pile-label">Pioche (${deckCount})</div>
-        <div class="card face-down" id="pile-deck" onclick="Handlers.clickDeck()"></div>
-      </div>
-      <div class="pile">
-        <div class="pile-label">Défausse</div>
-        ${discardTop
-          ? `<div class="card ${cardSuitClass(discardTop)}" id="pile-discard" onclick="Handlers.clickDiscard()" style="font-size:1.1em">${cardLabel(discardTop)}</div>`
-          : '<div class="card face-down" style="opacity:.3"></div>'}
-      </div>`;
-
-    // Show drawn card
-    if (gameState.drawnCard && isMyTurn && gameState.turnPhase === 'held') {
-      pilesHtml += `<div class="pile">
-        <div class="pile-label">En main</div>
-        <div class="card ${cardSuitClass(gameState.drawnCard)} highlight" style="font-size:1.1em" onclick="Handlers.discardDrawn()" title="Tap = défausser">${cardLabel(gameState.drawnCard)}</div>
-        <div style="font-size:.6em;color:#e94560;margin-top:2px">Tap = défausser</div>
-      </div>`;
-    } else if (gameState.drawnCard && !isMyTurn) {
-      pilesHtml += `<div class="pile">
-        <div class="pile-label">${cp?.name || '?'}</div>
-        <div class="card face-down highlight"></div>
-      </div>`;
+    if (sub === 'choose') {
+      if (myChosen) statusEl.textContent = '✅ Carte choisie — en attente des autres…';
+      else statusEl.textContent = '👆 Choisissez une carte face cachée';
+    } else if (sub === 'dekal_picks') {
+      statusEl.textContent = iAmDekal ? '🏅 Choisissez une carte au centre !' : '🏅 ' + (dekalPlayer?.name || '?') + ' choisit…';
+    } else if (sub === 'others_push') {
+      const exp = gameState.pushQueue?.[gameState.pushQueueIdx];
+      const expName = getPlayerName(exp);
+      statusEl.textContent = iAmInPushQueue ? '👆 Choisissez une carte au centre !' : expName + ' choisit une carte…';
+    } else if (sub === 'push_mine') {
+      const pusherName = getPlayerName(gameState.pendingCard?.playerId);
+      statusEl.textContent = iAmPushing ? '➡️ Insérez le ' + gameState.pendingCard.v + ' dans votre grille' : pusherName + ' insère sa carte…';
     }
 
-    if (pilesArea.dataset.lastHtml !== pilesHtml) { pilesArea.dataset.lastHtml = pilesHtml; pilesArea.innerHTML = pilesHtml; }
+    // Centre
+    const showCenter = sub !== 'choose' && gameState.centerCards?.length > 0;
+    centerArea.style.display = showCenter ? '' : 'none';
+    if (showCenter) {
+      const canPickCenter = (sub === 'dekal_picks' && iAmDekal) || iAmInPushQueue;
+      let ch = `<div class="center-title">🃏 Cartes au centre</div><div class="center-cards-row">`;
+      gameState.centerCards.forEach((cc, i) => {
+        ch += `<div class="card ${cvClass(cc.v)}${canPickCenter ? ' center-choice' : ''}" onclick="${canPickCenter ? 'performAction({type:\'pick_center\',centerIdx:' + i + '})' : ''}">
+          ${cc.v}
+        </div>`;
+      });
+      ch += '</div>';
+      if (centerArea.dataset.last !== ch) { centerArea.dataset.last = ch; centerArea.innerHTML = ch; }
+    }
 
     // Players
     const myIndex = gameState.players.findIndex(p => p.id === myPlayerId);
-    const nextIndex = myIndex >= 0 ? (myIndex + 1) % gameState.players.length : -1;
-    const nextPlayerId = (nextIndex >= 0 && nextIndex !== myIndex) ? gameState.players[nextIndex]?.id : null;
-    const currentPlayerId = gameState.players[gameState.currentPlayerIndex]?.id;
-
     const orderedPlayers = [...gameState.players].sort((a, b) => {
-      if (a.id === myPlayerId) return -1; if (b.id === myPlayerId) return 1;
-      if (a.id === nextPlayerId) return -1; if (b.id === nextPlayerId) return 1;
-      return 0;
+      if (a.id === myPlayerId) return -1; if (b.id === myPlayerId) return 1; return 0;
     });
-    const multiMode = gameState.players.length > 2;
     const fullGridIds = new Set([myPlayerId]);
-    if (multiMode && nextPlayerId) fullGridIds.add(nextPlayerId);
+    const multiMode = gameState.players.length > 2;
     if (!multiMode) gameState.players.forEach(p => fullGridIds.add(p.id));
-    const fullPlayers = orderedPlayers.filter(p => fullGridIds.has(p.id));
-    const compactPlayers = orderedPlayers.filter(p => !fullGridIds.has(p.id));
+    const fullP = orderedPlayers.filter(p => fullGridIds.has(p.id));
+    const compactP = orderedPlayers.filter(p => !fullGridIds.has(p.id));
 
-    let playersHtml = '';
+    let html = '';
 
-    fullPlayers.forEach(p => {
+    fullP.forEach(p => {
       const isMe = p.id === myPlayerId;
-      const isCurrent = currentPlayerId === p.id;
-      const handScore = calcHandScore2(p.id);
-      const totalScore = gameState.totalScores[p.id] || 0;
-      const colorIdx = gameState.players.findIndex(pl => pl.id === p.id) % 8;
-      const discoTag = p.disconnected ? '<span class="reconnecting-badge">⚠️ déconnecté</span>' : '';
-      const kickBtn = (isHost && !isMe && !p.isHost && !p.isBot) ? `<button class="kick-in-game-btn" onclick="App.confirmKickPlayer('${p.id}','${p.name.replace(/'/g,String.fromCharCode(39))}')">✕ Exclure</button>` : '';
+      const colorIdx = gameState.players.findIndex(pl => pl.id === p.id) % 6;
+      const isDekalHolder = p.id === dekalPlayer?.id;
+      const isPushing = iAmPushing && isMe;
+      const discoTag = p.disconnected ? '<span class="reconnecting-badge">⚠️</span>' : '';
 
-      playersHtml += `<div class="player-zone pcolor-${colorIdx} ${isCurrent ? 'current-turn' : ''} ${isMe ? 'is-me' : ''}">
+      // Calculer score visible
+      const grid = gameState.grids[p.id];
+      let visScore = 0;
+      if (grid) for (let r = 0; r < GRID; r++) for (let c = 0; c < GRID; c++) if (grid[r][c]?.revealed) visScore += grid[r][c].v;
+
+      html += `<div class="player-zone pcolor-${colorIdx} ${isDekalHolder ? 'dekal-turn' : ''} ${isMe ? 'is-me' : ''}">
         <div class="player-header">
-          <span class="player-name">${p.name}${isMe ? ' (vous)' : ''} ${discoTag}${kickBtn}</span>
-          <span>
-            ${isCurrent ? '<span class="turn-indicator">▶ </span>' : ''}
-            <span class="player-score">Main: ${handScore} pts | Total: ${totalScore}</span>
-          </span>
-        </div>
-        <div class="hand-area">`;
+          <span class="player-name-label">${p.name}${isMe?'<span style="font-size:.75em;color:#aaa"> (vous)</span>':''}${isDekalHolder?'<span class="dekal-pion"> 🏅</span>':''} ${discoTag}</span>
+          <span class="player-score-label">Visible : ${visScore} pts</span>
+        </div>`;
 
-      const hand = (isMe && isHost ? gameState.hands[p.id] : (isMe ? gameState.hands[p.id] : null));
-
-      if (hand) {
-        hand.forEach((card, idx) => {
-          const isSelected = isMe && _selectedCardIndex === idx;
-          const isSwapTarget = isMe && isMyTurn && gameState.turnPhase === 'held';
-          playersHtml += `<div class="card ${cardSuitClass(card)}${isSelected ? ' selected-src' : ''}${isSwapTarget ? ' selectable' : ''}" 
-            onclick="Handlers.clickHandCard(${idx})" 
-            style="font-size:1.05em">
-            ${cardLabel(card)}
-          </div>`;
-        });
+      if (isPushing) {
+        // Mode insertion : afficher les flèches autour de la grille
+        html += buildPushUI(p.id, gameState.pendingCard.v);
       } else {
-        // Other players: show face-down or visible depending on game phase
-        const theirHand = gameState.hands[p.id];
-        if (theirHand) {
-          theirHand.forEach((card, idx) => {
-            // In Dékal all cards are face-up (visible to all)
-            playersHtml += `<div class="card ${cardSuitClass(card)}" style="font-size:1.05em">${cardLabel(card)}</div>`;
-          });
-        } else {
-          for (let i = 0; i < HAND_SIZE; i++) playersHtml += '<div class="card face-down"></div>';
-        }
+        html += buildGrid(p.id, isMe, sub, myChosen, isMe && sub === 'choose' && !myChosen);
       }
-
-      playersHtml += '</div></div>';
+      html += '</div>';
     });
 
     // Compact players
-    if (compactPlayers.length > 0) {
-      playersHtml += '<div class="compact-players-list">';
-      compactPlayers.forEach(p => {
-        const colorIdx = gameState.players.findIndex(pl => pl.id === p.id) % 8;
-        const isCurrent = currentPlayerId === p.id;
-        const handScore = calcHandScore2(p.id);
-        const totalScore = gameState.totalScores[p.id] || 0;
-        const mini = (gameState.hands[p.id] || []).map(c =>
-          `<div class="compact-mini-card ${cardSuitClass(c)}" style="font-size:.55em">${c.rank.length<=2?c.rank:'?'}</div>`
-        ).join('');
-        playersHtml += `<div class="compact-player-row pcolor-${colorIdx} ${isCurrent ? 'current-turn' : ''}">
-          <div class="compact-player-avatar">${p.name[0].toUpperCase()}</div>
-          <div class="compact-player-info">
-            <div class="compact-player-name">${p.name}${p.isBot?' 🤖':''}</div>
-            <div class="compact-player-scores">Main: <strong>${handScore}</strong> · Total: ${totalScore}</div>
+    if (compactP.length) {
+      html += '<div class="compact-list">';
+      compactP.forEach(p => {
+        const colorIdx = gameState.players.findIndex(pl => pl.id === p.id) % 6;
+        const isDekalHolder = p.id === dekalPlayer?.id;
+        const grid = gameState.grids[p.id];
+        let visScore = 0;
+        if (grid) for (let r = 0; r < GRID; r++) for (let c = 0; c < GRID; c++) if (grid[r][c]?.revealed) visScore += grid[r][c].v;
+        const chosen = gameState.chosen?.[p.id];
+        let miniHtml = '<div class="compact-mini-grid">';
+        if (grid) for (let r = 0; r < GRID; r++) for (let c = 0; c < GRID; c++) {
+          const cell = grid[r][c];
+          if (!cell) miniHtml += '<div class="mini-cell" style="background:rgba(255,255,255,.05);opacity:.3"></div>';
+          else if (!cell.revealed) miniHtml += '<div class="mini-cell face-down"></div>';
+          else miniHtml += `<div class="mini-cell ${cvClass(cell.v)}">${cell.v}</div>`;
+        }
+        miniHtml += '</div>';
+        html += `<div class="compact-row pcolor-${colorIdx} ${isDekalHolder?'dekal-turn':''}">
+          <div class="compact-avatar">${p.name[0].toUpperCase()}</div>
+          <div class="compact-info">
+            <div class="compact-name">${p.name}${isDekalHolder?' 🏅':''}${p.isBot?' 🤖':''}</div>
+            <div class="compact-detail">Visible : ${visScore} pts${chosen?' · ✅ carte choisie':''}</div>
           </div>
-          <div class="compact-mini-cards">${mini}</div>
-          ${isCurrent ? '<div class="compact-turn-dot"></div>' : ''}
+          ${miniHtml}
         </div>`;
       });
-      playersHtml += '</div>';
+      html += '</div>';
     }
 
-    if (playersArea.dataset.lastHtml !== playersHtml) { playersArea.dataset.lastHtml = playersHtml; playersArea.innerHTML = playersHtml; }
+    if (playersArea.dataset.last !== html) { playersArea.dataset.last = html; playersArea.innerHTML = html; }
 
-    // Action bar
+    // Action bar — show confirm if card chosen and waiting
     let barHtml = '';
-    if (isMyTurn && gameState.turnPhase === 'held') {
-      barHtml = `<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-        <button onclick="Handlers.discardDrawn()" style="background:rgba(231,76,60,.3);border:1px solid rgba(231,76,60,.6)">🗑 Défausser</button>
-        ${!gameState.dekalBy ? `<button onclick="Handlers.sayDekal()" style="background:linear-gradient(135deg,#f5a623,#e94560)">🎉 Dire DÉKAL !</button>` : ''}
-      </div>
-      <div style="text-align:center;font-size:.72em;color:#aaa;margin-top:4px">Ou tapez une carte pour l'échanger</div>`;
-    } else if (isMyTurn && gameState.turnPhase === 'draw') {
-      if (gameState.dekalBy && gameState.dekalBy !== myPlayerId) {
-        barHtml = `<div style="text-align:center;font-size:.8em;color:#f5a623">⚡ Dernier tour — piochez puis échangez !</div>`;
+    if (sub === 'choose' && myChosen) {
+      barHtml = `<div style="text-align:center;font-size:.8em;color:#aaa">✅ Carte choisie — en attente des autres joueurs</div>`;
+    }
+    actionBar.innerHTML = barHtml;
+    actionBar.style.display = barHtml ? '' : 'none';
+  }
+
+  function buildGrid(pid, isMe, sub, myChosen, canSelect) {
+    const grid = gameState.grids[pid];
+    if (!grid) return '';
+    let h = '<div class="grid-wrap">';
+    for (let r = 0; r < GRID; r++) {
+      h += '<div class="grid-row">';
+      for (let c = 0; c < GRID; c++) {
+        const cell = grid[r][c];
+        if (!cell) {
+          // Empty slot (chosen card removed)
+          h += '<div class="card" style="background:rgba(255,255,255,.04);border:2px dashed rgba(255,255,255,.1);opacity:.5"></div>';
+        } else if (!cell.revealed) {
+          const sel = isMe && myChosen && myChosen.row === r && myChosen.col === c;
+          const clickable = canSelect && isMe;
+          h += `<div class="card face-down${sel?' selected':''}${clickable?' selectable':''}" onclick="${clickable?'performAction({type:\'choose_card\',row:'+r+',col:'+c+'})':''}"></div>`;
+        } else {
+          h += `<div class="card ${cvClass(cell.v)}">${cell.v}</div>`;
+        }
       }
+      h += '</div>';
     }
-    if (actionBar.dataset.lastHtml !== barHtml) {
-      actionBar.dataset.lastHtml = barHtml;
-      actionBar.innerHTML = barHtml;
-      actionBar.style.display = barHtml ? '' : 'none';
-    }
+    h += '</div>';
+    return h;
   }
 
-  function calcHandScore2(pid) {
-    return (gameState.hands[pid] || []).reduce((s, c) => s + cardValue(c.rank), 0);
+  function buildPushUI(pid, cardV) {
+    // Build the grid with push arrows on all 4 sides
+    const grid = gameState.grids[pid];
+    // Top arrows (col_down)
+    let h = '<div style="display:inline-flex;flex-direction:column;align-items:center;gap:2px">';
+    // Top row arrows
+    h += '<div style="display:flex;gap:4px;margin-left:32px">';
+    for (let c = 0; c < GRID; c++) h += `<button class="push-btn col-btn" onclick="performAction({type:'push_card',dir:'col_down',idx:${c}})" title="Insérer en haut col ${c}">↓</button>`;
+    h += '</div>';
+
+    // Middle: left arrows | grid | right arrows
+    h += '<div style="display:flex;gap:2px;align-items:center">';
+    // Left arrows (row_right)
+    h += '<div style="display:flex;flex-direction:column;gap:4px">';
+    for (let r = 0; r < GRID; r++) h += `<button class="push-btn" onclick="performAction({type:'push_card',dir:'row_right',idx:${r}})" title="Insérer à gauche ligne ${r}">→</button>`;
+    h += '</div>';
+    // Grid
+    h += '<div class="grid-wrap">';
+    for (let r = 0; r < GRID; r++) {
+      h += '<div class="grid-row">';
+      for (let c = 0; c < GRID; c++) {
+        const cell = grid[r][c];
+        if (!cell) h += '<div class="card" style="background:rgba(255,255,255,.04);border:2px dashed rgba(255,255,255,.15)"></div>';
+        else if (!cell.revealed) h += '<div class="card face-down"></div>';
+        else h += `<div class="card ${cvClass(cell.v)}">${cell.v}</div>`;
+      }
+      h += '</div>';
+    }
+    h += '</div>';
+    // Right arrows (row_left)
+    h += '<div style="display:flex;flex-direction:column;gap:4px">';
+    for (let r = 0; r < GRID; r++) h += `<button class="push-btn" onclick="performAction({type:'push_card',dir:'row_left',idx:${r}})" title="Insérer à droite ligne ${r}">←</button>`;
+    h += '</div></div>';
+
+    // Bottom arrows (col_up)
+    h += '<div style="display:flex;gap:4px;margin-left:32px">';
+    for (let c = 0; c < GRID; c++) h += `<button class="push-btn col-btn" onclick="performAction({type:'push_card',dir:'col_up',idx:${c}})" title="Insérer en bas col ${c}">↑</button>`;
+    h += '</div>';
+
+    // Card to insert
+    h += `<div style="margin-top:8px;display:flex;align-items:center;gap:8px;font-size:.8em;color:#aaa"><span>Carte à insérer :</span><div class="card ${cvClass(cardV)}" style="width:40px;height:40px;font-size:1.1em;pointer-events:none">${cardV}</div></div>`;
+    h += '</div>';
+    return h;
   }
 
-  function renderRoundScores() {
-    const table = document.getElementById('round-scores-table');
+  function renderScores() {
+    const scores = gameState.roundScores || {};
     const sub = document.getElementById('round-scores-subtitle');
-    if (sub) sub.textContent = 'Manche ' + gameState.round;
-    const sorted = [...gameState.players].sort((a, b) => (gameState.totalScores[a.id]||0) - (gameState.totalScores[b.id]||0));
-    let html = '<thead><tr><th>Joueur</th><th>Manche</th><th>Total</th></tr></thead><tbody>';
+    if (sub) sub.textContent = 'Les cartes adjacentes identiques ont été annulées';
+    const sorted = [...gameState.players].sort((a, b) => (scores[a.id] || 0) - (scores[b.id] || 0));
+    let html = '<thead><tr><th>Joueur</th><th>Score</th></tr></thead><tbody>';
     sorted.forEach((p, i) => {
-      const rs = gameState.roundScores[p.id] || 0;
-      const ts = gameState.totalScores[p.id] || 0;
+      const s = scores[p.id] || 0;
       const isMe = p.id === myPlayerId;
-      const isDekal = p.id === gameState.dekalBy;
-      html += `<tr${i === 0 ? ' class="winner"' : ''}><td>${p.name}${isDekal?' 🎉':''}${isMe?'<br><small style="color:#aaa;font-size:.72em">vous</small>':''}</td><td>${rs}</td><td class="total">${ts}</td></tr>`;
+      html += `<tr${i===0?' class="winner"':''}><td>${p.name}${isMe?'<br><small style="color:#aaa;font-size:.72em">vous</small>':''}</td><td class="total">${s}</td></tr>`;
     });
     html += '</tbody>';
-    table.innerHTML = html;
+    document.getElementById('round-scores-table').innerHTML = html;
     document.getElementById('next-round-btn').style.display = isHost ? '' : 'none';
-  }
-
-  function renderFinalScores() {
-    const sorted = [...gameState.players].sort((a, b) => (gameState.totalScores[a.id]||0) - (gameState.totalScores[b.id]||0));
-    document.getElementById('final-winner-banner').innerHTML = `<div class="winner-name">🎉 ${sorted[0].name} remporte la partie ! 🎉</div>`;
-    const medals = ['🥇','🥈','🥉'];
-    document.getElementById('final-score-cards').innerHTML = sorted.map((p, i) => {
-      const ts = gameState.totalScores[p.id] || 0;
-      return `<div class="score-card${i < 3 ? ' rank-'+(i+1) : ''}">
-        <div class="score-card-medal">${medals[i] || i+1}</div>
-        <div class="score-card-name">${p.name}${p.id===myPlayerId?'<small>vous</small>':''}</div>
-        <div class="score-card-pts">${ts} pts</div>
-      </div>`;
-    }).join('');
-    Leaderboard.render('final-leaderboard');
   }
 
   return { fromState, renderLobby };
 })();
 
-// ============================================================
-// 11. CLICK HANDLERS
-// ============================================================
-const Handlers = (() => {
-  function clickDeck() {
-    if (!gameState || gameState.phase !== 'playing') return;
-    const isMyTurn = gameState.players[gameState.currentPlayerIndex]?.id === myPlayerId;
-    if (!isMyTurn || gameState.turnPhase !== 'draw') return;
-    Sound.play('card_flip');
-    _selectedCardIndex = null;
-    performAction({ type: 'draw_deck' });
-  }
-
-  function clickDiscard() {
-    if (!gameState || gameState.phase !== 'playing') return;
-    const isMyTurn = gameState.players[gameState.currentPlayerIndex]?.id === myPlayerId;
-    if (!isMyTurn || gameState.turnPhase !== 'draw') return;
-    if (!gameState.discard || gameState.discard.length === 0) return;
-    Sound.play('card_flip');
-    _selectedCardIndex = null;
-    performAction({ type: 'draw_discard' });
-  }
-
-  function clickHandCard(idx) {
-    if (!gameState || gameState.phase !== 'playing') return;
-    const isMyTurn = gameState.players[gameState.currentPlayerIndex]?.id === myPlayerId;
-    if (!isMyTurn) return;
-    if (gameState.turnPhase === 'held') {
-      // Swap drawn card with card at idx
-      Sound.play('swap');
-      _selectedCardIndex = null;
-      performAction({ type: 'swap_card', idx });
-    }
-  }
-
-  function discardDrawn() {
-    const isMyTurn = gameState?.players[gameState.currentPlayerIndex]?.id === myPlayerId;
-    if (!isMyTurn || gameState.turnPhase !== 'held') return;
-    performAction({ type: 'discard_drawn' });
-  }
-
-  function sayDekal() {
-    const isMyTurn = gameState?.players[gameState.currentPlayerIndex]?.id === myPlayerId;
-    if (!isMyTurn) return;
-    if (gameState.dekalBy) { UI.toast('Dékal a déjà été dit !'); return; }
-    // Say Dékal happens after acting, so we first need to be in 'held' or just finishing a turn
-    if (gameState.turnPhase !== 'held') { UI.toast('Piocheez d\'abord une carte'); return; }
-    performAction({ type: 'say_dekal' });
-  }
-
-  return { clickDeck, clickDiscard, clickHandCard, discardDrawn, sayDekal };
-})();
-
-// ============================================================
-// 12. APP — Orchestration
-// ============================================================
+// ── APP ──
 const App = (() => {
   let _botDifficulty = 'moyen';
 
+  function _makeInitialState(name, isSolo, botDiff) {
+    const pid = myPeerId;
+    const players = [{ id: pid, name, isHost: true, isBot: false, disconnected: false }];
+    if (isSolo) players.push({ id: 'bot-1', name: 'Bot', isHost: false, isBot: true, disconnected: false });
+    const ts = {};
+    players.forEach(p => ts[p.id] = 0);
+    return {
+      phase: 'lobby', isSolo, botDifficulty: botDiff,
+      players, totalScores: ts,
+      grids: {}, chosen: {}, centerCards: [], pushQueue: [],
+      turn: 0, dekalIdx: 0, subPhase: 'choose',
+      pendingCard: null, roundScores: {}
+    };
+  }
+
   async function showJoinScreen() {
-    const nameInput = document.getElementById('player-name');
-    const joinName = document.getElementById('join-name');
-    joinName.value = nameInput.value;
+    const n = document.getElementById('player-name');
+    document.getElementById('join-name').value = n.value;
     UI.showScreen('screen-join');
-    const roomParam = document.getElementById('room-input').value;
-    if (roomParam) checkRoomStatus(roomParam);
+    const code = document.getElementById('room-input').value;
+    if (code) checkRoomStatus(code);
   }
 
   async function createSoloGame() {
@@ -1606,24 +1406,13 @@ const App = (() => {
       roomCode = Network.generateRoomCode();
       await Network.initPeer('dekal' + roomCode);
       Network.setupHostListeners();
-      isHost = true;
-      myPlayerId = myPeerId;
-      gameState = {
-        phase: 'lobby', round: 0, isSolo: true, botDifficulty: _botDifficulty, targetScore: App._targetScore,
-        players: [
-          { id: myPlayerId, name, isHost: true, isBot: false, disconnected: false },
-          { id: 'bot-1', name: 'Bot', isHost: false, isBot: true, disconnected: false }
-        ],
-        hands: {}, discard: [], deck: [], currentPlayerIndex: 0, turnPhase: 'draw',
-        drawnCard: null, dekalBy: null, dekalTurnsLeft: -1, roundScores: {},
-        totalScores: { [myPlayerId]: 0, 'bot-1': 0 },
-        gameStartTime: Date.now()
-      };
+      isHost = true; myPlayerId = myPeerId;
+      gameState = _makeInitialState(name, true, _botDifficulty);
       try { localStorage.setItem('dekal_activeRoom', roomCode); } catch(e) {}
       UI.setConnStatus('connected', '');
       Render.fromState();
       updateDiffButtons();
-    } catch(e) { UI.setConnStatus('', ''); UI.toast('Erreur connexion : ' + e.message); }
+    } catch(e) { UI.setConnStatus('', ''); UI.toast('Erreur : ' + e.message); }
   }
 
   async function createGame() {
@@ -1634,31 +1423,21 @@ const App = (() => {
       roomCode = Network.generateRoomCode();
       await Network.initPeer('dekal' + roomCode);
       Network.setupHostListeners();
-      isHost = true;
-      myPlayerId = myPeerId;
-      gameState = {
-        phase: 'lobby', round: 0, isSolo: false, targetScore: App._targetScore,
-        players: [{ id: myPlayerId, name, isHost: true, isBot: false, disconnected: false }],
-        hands: {}, discard: [], deck: [], currentPlayerIndex: 0, turnPhase: 'draw',
-        drawnCard: null, dekalBy: null, dekalTurnsLeft: -1, roundScores: {},
-        totalScores: { [myPlayerId]: 0 },
-        gameStartTime: Date.now()
-      };
+      isHost = true; myPlayerId = myPeerId;
+      gameState = _makeInitialState(name, false, _botDifficulty);
       try { localStorage.setItem('dekal_activeRoom', roomCode); } catch(e) {}
       UI.setConnStatus('connected', '');
       document.getElementById('lobby-code').textContent = roomCode;
       Render.fromState();
       generateQR();
-    } catch(e) { UI.setConnStatus('', ''); UI.toast('Erreur connexion : ' + e.message); }
+    } catch(e) { UI.setConnStatus('', ''); UI.toast('Erreur : ' + e.message); }
   }
 
   async function joinGame() {
     const name = document.getElementById('join-name').value.trim() || document.getElementById('player-name').value.trim() || 'Joueur';
     const code = document.getElementById('room-input').value.trim().toUpperCase();
     if (!code || code.length !== 5) { UI.toast('Code invalide'); return; }
-    myName = name;
-    document.getElementById('player-name').value = name;
-    roomCode = code;
+    myName = name; document.getElementById('player-name').value = name; roomCode = code;
     try {
       UI.setConnStatus('connecting', '📡 Connexion...');
       await Network.initPeer();
@@ -1666,84 +1445,60 @@ const App = (() => {
       const conn = peer.connect('dekal' + code, { reliable: true });
       conn.on('open', () => {
         hostConn = conn;
-        conn.on('data', data => _handleClientMsg(data));
+        conn.on('data', Network.handleClientMessage);
         conn.on('close', () => { hostConn = null; Network.scheduleReconnect(); });
         conn.send({ type: 'join', name, id: myPeerId, lastId: myPeerId });
         UI.setConnStatus('connected', '');
         try { localStorage.setItem('dekal_activeRoom', code); } catch(e) {}
       });
       conn.on('error', () => { UI.toast('Impossible de rejoindre'); UI.setConnStatus('', ''); });
-      setTimeout(() => { if (!hostConn || !hostConn.open) { UI.toast('Hôte introuvable — vérifiez le code'); UI.setConnStatus('', ''); } }, 12000);
+      setTimeout(() => { if (!hostConn || !hostConn.open) { UI.toast('Hôte introuvable'); UI.setConnStatus('', ''); } }, 12000);
     } catch(e) { UI.setConnStatus('', ''); UI.toast('Erreur : ' + e.message); }
   }
-
-
 
   async function checkRoomStatus(code) {
     if (!code || code.length !== 5) return;
     const badge = document.getElementById('room-status-badge');
-    badge.style.display = '';
-    badge.style.background = 'rgba(255,255,255,.08)';
-    badge.style.color = '#aaa';
-    badge.textContent = '…';
+    badge.style.display = ''; badge.style.background = 'rgba(255,255,255,.08)'; badge.style.color = '#aaa'; badge.textContent = '…';
     try {
       await Network.initPeer();
       const conn = peer.connect('dekal' + code.toUpperCase(), { reliable: true });
-      let resolved = false;
-      conn.on('open', () => { conn.send({ type: 'status_check' }); });
-      conn.on('data', data => {
-        if (resolved || data.type !== 'status_response') return;
-        resolved = true;
-        try { conn.close(); } catch(e) {}
-        if (data.status === 'open') { badge.style.background = 'rgba(46,204,113,.15)'; badge.style.color = '#2ecc71'; badge.textContent = '✅ Salle ouverte'; }
-        else if (data.status === 'playing') { badge.style.background = 'rgba(231,76,60,.15)'; badge.style.color = '#e74c3c'; badge.textContent = '🔒 Partie en cours'; UI.showGameInProgressWarning(); }
-        else if (data.status === 'full') { badge.style.background = 'rgba(231,76,60,.15)'; badge.style.color = '#e74c3c'; badge.textContent = '🚫 Salle pleine'; }
+      let done = false;
+      conn.on('open', () => conn.send({ type: 'status_check' }));
+      conn.on('data', d => {
+        if (done || d.type !== 'status_response') return; done = true; try { conn.close(); } catch(e) {}
+        if (d.status === 'open') { badge.style.background = 'rgba(46,204,113,.15)'; badge.style.color = '#2ecc71'; badge.textContent = '✅ Salle ouverte'; }
+        else if (d.status === 'playing') { badge.style.background = 'rgba(231,76,60,.15)'; badge.style.color = '#e74c3c'; badge.textContent = '🔒 Partie en cours'; UI.showGameInProgressWarning(); }
+        else { badge.style.background = 'rgba(231,76,60,.15)'; badge.style.color = '#e74c3c'; badge.textContent = '🚫 Salle pleine'; }
       });
-      conn.on('error', () => { if (!resolved) { badge.textContent = '? Impossible de vérifier'; } });
-      setTimeout(() => { if (!resolved) { badge.textContent = '? Pas de réponse'; try { conn.close(); } catch(e) {} } }, 6000);
+      conn.on('error', () => { if (!done) badge.textContent = '? Vérification impossible'; });
+      setTimeout(() => { if (!done) { badge.textContent = '? Pas de réponse'; try { conn.close(); } catch(e) {} } }, 6000);
     } catch(e) {}
   }
 
   function switchToMulti() {
     if (!gameState || !isHost) return;
     gameState.isSolo = false;
-    const botIdx = gameState.players.findIndex(p => p.isBot);
-    if (botIdx >= 0) {
-      delete gameState.totalScores[gameState.players[botIdx].id];
-      gameState.players.splice(botIdx, 1);
-    }
-    Network.broadcastState();
-    generateQR();
+    const bi = gameState.players.findIndex(p => p.isBot);
+    if (bi >= 0) { delete gameState.totalScores[gameState.players[bi].id]; gameState.players.splice(bi, 1); }
+    Network.broadcastState(); generateQR();
   }
 
-  function setBotDifficulty(diff) {
-    _botDifficulty = diff;
-    if (gameState) gameState.botDifficulty = diff;
-    updateDiffButtons();
-  }
-
+  function setBotDifficulty(d) { _botDifficulty = d; if (gameState) gameState.botDifficulty = d; updateDiffButtons(); }
   function updateDiffButtons() {
-    ['facile','moyen','fort'].forEach(d => {
-      const btn = document.getElementById('diff-' + d);
-      if (btn) btn.style.opacity = (_botDifficulty === d ? '1' : '0.45');
-    });
+    ['facile','moyen','fort'].forEach(d => { const b = document.getElementById('diff-' + d); if (b) b.style.opacity = (_botDifficulty === d ? '1' : '.45'); });
   }
-
-  function showLobby() { Render.fromState(); }
 
   function copyCode() {
     const url = window.location.href.split('?')[0] + '?room=' + roomCode;
-    navigator.clipboard?.writeText(url).then(() => UI.toast('📋 Lien copié !')).catch(() => {
-      try { const el = document.createElement('input'); el.value = url; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); UI.toast('📋 Lien copié !'); } catch(e) { UI.toast('Code : ' + roomCode); }
-    });
+    navigator.clipboard?.writeText(url).then(() => UI.toast('📋 Lien copié !')).catch(() => { try { const e = document.createElement('input'); e.value = url; document.body.appendChild(e); e.select(); document.execCommand('copy'); document.body.removeChild(e); UI.toast('📋 Lien copié !'); } catch(e) { UI.toast('Code : ' + roomCode); } });
   }
 
   function leaveLobby() {
     try { if (peer) peer.destroy(); } catch(e) {}
     try { localStorage.removeItem('dekal_activeRoom'); } catch(e) {}
     peer = null; connections = {}; hostConn = null; isHost = false; gameState = null; roomCode = ''; myPlayerId = ''; myPeerId = '';
-    UI.setConnStatus('', '');
-    UI.showScreen('screen-menu');
+    UI.setConnStatus('', ''); UI.showScreen('screen-menu');
   }
 
   function backToMenu(clearState) {
@@ -1753,134 +1508,96 @@ const App = (() => {
       try { localStorage.removeItem('dekal_activeRoom'); } catch(e) {}
       peer = null; connections = {}; hostConn = null; isHost = false; gameState = null; roomCode = ''; myPlayerId = ''; myPeerId = '';
     }
-    _selectedCardIndex = null;
-    UI.setConnStatus('', '');
-    UI.showScreen('screen-menu');
+    UI.setConnStatus('', ''); UI.showScreen('screen-menu');
   }
 
   function startGame() {
     if (!isHost || !gameState || gameState.players.length < 2) return;
     gameState.totalScores = {};
-    gameState.players.forEach(p => { gameState.totalScores[p.id] = 0; });
-    gameState.round = 0;
-    gameState.gameStartTime = Date.now();
+    gameState.players.forEach(p => gameState.totalScores[p.id] = 0);
     initRound();
   }
 
   function nextRound() {
     if (!isHost || !gameState) return;
-    // Reset per-round state
-    gameState.dekalBy = null;
-    gameState.dekalTurnsLeft = -1;
     gameState.roundScores = {};
     initRound();
   }
 
-  function kickPlayer(playerId) {
+  function kickPlayer(pid) {
     if (!isHost || !gameState) return;
-    const player = gameState.players.find(p => p.id === playerId);
-    if (!player) return;
-    try { if (connections[playerId]) { connections[playerId].send({ type: 'rejected', msg: 'Vous avez été expulsé' }); connections[playerId].close(); delete connections[playerId]; } } catch(e) {}
-    gameState.players = gameState.players.filter(p => p.id !== playerId);
-    delete gameState.totalScores[playerId];
-    Network.broadcastState();
-    UI.toast(player.name + ' a été expulsé');
+    const p = gameState.players.find(p => p.id === pid); if (!p) return;
+    try { if (connections[pid]) { connections[pid].send({ type: 'rejected', msg: 'Expulsé' }); connections[pid].close(); delete connections[pid]; } } catch(e) {}
+    gameState.players = gameState.players.filter(p => p.id !== pid);
+    delete gameState.totalScores[pid];
+    Network.broadcastState(); UI.toast(p.name + ' expulsé');
   }
 
-  function confirmKickPlayer(playerId, name) {
-    UI.showModal('Exclure ' + name + ' ?', 'Ce joueur sera retiré de la partie.', [
-      { text: 'Annuler', action: 'UI.closeModal()' },
-      { text: '✕ Exclure', action: `UI.closeModal();App.kickPlayer('${playerId}')` }
-    ]);
-  }
+  function confirmKickPlayer(pid, name) { UI.showModal('Exclure ' + name + ' ?', '', [{ text: 'Annuler', action: 'UI.closeModal()' }, { text: '✕ Exclure', action: `UI.closeModal();App.kickPlayer('${pid}')` }]); }
 
   function checkResume() {
     try {
       const saved = localStorage.getItem('dekal_activeRoom');
       const banner = document.getElementById('resume-game-banner');
-      const codeEl = document.getElementById('resume-code');
-      if (saved && banner && codeEl) { codeEl.textContent = saved; banner.style.display = ''; }
+      if (saved && banner) { document.getElementById('resume-code').textContent = saved; banner.style.display = ''; }
       else if (banner) banner.style.display = 'none';
     } catch(e) {}
   }
 
   function resumeGame() {
     try {
-      const saved = localStorage.getItem('dekal_activeRoom');
-      if (saved) {
-        document.getElementById('room-input').value = saved;
-        document.getElementById('join-name').value = document.getElementById('player-name').value || myName || 'Joueur';
-        App.showJoinScreen();
-      }
+      const saved = localStorage.getItem('dekal_activeRoom'); if (!saved) return;
+      document.getElementById('room-input').value = saved;
+      document.getElementById('join-name').value = document.getElementById('player-name').value || myName || 'Joueur';
+      showJoinScreen();
     } catch(e) {}
   }
 
   function dismissResume() {
     try { localStorage.removeItem('dekal_activeRoom'); } catch(e) {}
-    const banner = document.getElementById('resume-game-banner');
-    if (banner) banner.style.display = 'none';
+    const b = document.getElementById('resume-game-banner'); if (b) b.style.display = 'none';
   }
 
-  return { showJoinScreen, createSoloGame, createGame, joinGame, checkRoomStatus, switchToMulti, setBotDifficulty, showLobby, copyCode, leaveLobby, backToMenu, startGame, nextRound, kickPlayer, confirmKickPlayer, checkResume, resumeGame, dismissResume };
+  return { showJoinScreen, createSoloGame, createGame, joinGame, checkRoomStatus, switchToMulti, setBotDifficulty, copyCode, leaveLobby, backToMenu, startGame, nextRound, kickPlayer, confirmKickPlayer, checkResume, resumeGame, dismissResume };
 })();
-App._targetScore = END_SCORE;
 
-// ============================================================
-// HELPERS GLOBAUX
-// ============================================================
+// ── HELPERS GLOBAUX ──
 function showWaitingApproval() {
   UI.showScreen('screen-lobby');
-  document.getElementById('waiting-approval').style.display = '';
-  document.getElementById('lobby-solo-info').style.display = 'none';
-  document.getElementById('lobby-multi-info').style.display = 'none';
-  document.getElementById('lobby-players').style.display = 'none';
-  document.querySelector('#screen-lobby .btn-group').style.display = 'none';
+  ['waiting-approval'].forEach(id => { const e = document.getElementById(id); if (e) e.style.display = ''; });
+  ['lobby-solo-info','lobby-multi-info','lobby-players'].forEach(id => { const e = document.getElementById(id); if (e) e.style.display = 'none'; });
+  const bg = document.querySelector('#screen-lobby .btn-group'); if (bg) bg.style.display = 'none';
   document.getElementById('join-requests-area').style.display = 'none';
-  const nameEl = document.getElementById('waiting-approval-name');
-  if (nameEl) nameEl.textContent = 'Salle : ' + (roomCode || '');
+  const ne = document.getElementById('waiting-approval-name'); if (ne) ne.textContent = 'Salle : ' + (roomCode || '');
 }
 
 function hideWaitingApproval() {
-  document.getElementById('waiting-approval').style.display = 'none';
-  document.getElementById('lobby-players').style.display = '';
-  document.querySelector('#screen-lobby .btn-group').style.display = '';
+  const wa = document.getElementById('waiting-approval'); if (wa) wa.style.display = 'none';
+  const lp = document.getElementById('lobby-players'); if (lp) lp.style.display = '';
+  const bg = document.querySelector('#screen-lobby .btn-group'); if (bg) bg.style.display = '';
 }
 
 function generateQR() {
   const url = window.location.href.split('?')[0] + '?room=' + roomCode;
-  const container = document.getElementById('qr-container');
-  container.innerHTML = '';
-  try {
-    new QRCode(container, { text: url, width: 180, height: 180, colorDark: '#1a1a2e', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
-  } catch(e) {
-    container.innerHTML = '<p style="color:#333;font-size:.75em;padding:8px;word-break:break-all">' + url + '</p>';
-  }
+  const c = document.getElementById('qr-container'); c.innerHTML = '';
+  try { new QRCode(c, { text: url, width: 180, height: 180, colorDark: '#1a1a2e', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M }); }
+  catch(e) { c.innerHTML = '<p style="color:#333;font-size:.75em;padding:8px;word-break:break-all">' + url + '</p>'; }
 }
 
 function triggerBoom() {
-  const overlay = document.getElementById('boom-overlay');
-  overlay.innerHTML = '';
+  const o = document.getElementById('boom-overlay'); o.innerHTML = '';
   const colors = ['#e94560','#f5a623','#e67e22','#9b59b6','#2ecc71','#3498db'];
-  for (let i = 0; i < 30; i++) {
-    const p = document.createElement('div');
-    p.className = 'boom-particle';
-    const size = 6 + Math.random() * 12, angle = Math.random() * Math.PI * 2, dist = 80 + Math.random() * 200;
-    p.style.cssText = `width:${size}px;height:${size}px;background:${colors[Math.floor(Math.random() * colors.length)]};left:50%;top:50%;--dx:${Math.cos(angle) * dist}px;--dy:${Math.sin(angle) * dist}px;`;
-    overlay.appendChild(p);
+  for (let i = 0; i < 28; i++) {
+    const p = document.createElement('div'); p.className = 'boom-particle';
+    const s = 6+Math.random()*12, a = Math.random()*Math.PI*2, d = 80+Math.random()*200;
+    p.style.cssText = `width:${s}px;height:${s}px;background:${colors[Math.floor(Math.random()*colors.length)]};left:50%;top:50%;--dx:${Math.cos(a)*d}px;--dy:${Math.sin(a)*d}px;`;
+    o.appendChild(p);
   }
-  const txt = document.createElement('div'); txt.className = 'boom-text'; txt.textContent = '🎉 DÉKAL!';
-  overlay.appendChild(txt);
-  setTimeout(() => { overlay.innerHTML = ''; }, 1000);
+  const t = document.createElement('div'); t.className = 'boom-text'; t.textContent = '✨ Annulé!'; o.appendChild(t);
+  setTimeout(() => o.innerHTML = '', 1000);
 }
 
-// Expose calcHandScore2 globally for bot
-function calcHandScore(playerId) {
-  return (gameState?.hands?.[playerId] || []).reduce((s, c) => s + cardValue(c.rank), 0);
-}
-
-// ============================================================
-// INIT
-// ============================================================
+// ── INIT ──
 window.addEventListener('load', () => {
   const splash = document.getElementById('splash-screen');
   setTimeout(() => { splash.classList.add('fade-out'); setTimeout(() => { splash.style.display = 'none'; }, 800); }, 4000);
