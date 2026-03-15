@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Dékal">
 <link rel="manifest" id="pwa-manifest">
-<title>Dékal Multijoueur v1.1.5</title>
+<title>Dékal Multijoueur v1.1.8</title>
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/davidshimjs-qrcodejs@0.0.2/qrcode.min.js"></script>
 <style>
@@ -202,6 +202,15 @@ input::placeholder{color:#888}
 .splash-title{font-size:3.5em;font-weight:900;background:linear-gradient(135deg,#e94560,#f5a623);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:8px;margin-bottom:12px;text-align:center}
 .splash-sub{font-size:.75em;color:rgba(255,255,255,.4);letter-spacing:3px;margin-bottom:4px;text-align:center}
 .splash-tagline{font-size:.62em;color:rgba(255,255,255,.25);text-align:center}
+.splash-cards{display:flex;gap:8px;justify-content:center;margin:16px 0 8px;flex-wrap:wrap}
+.splash-card{
+  width:44px;height:44px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.2em;font-weight:900;color:#fff;
+  border:2px solid rgba(255,255,255,.2);
+  animation:splashCardIn .4s ease-out both;
+}
+@keyframes splashCardIn{from{opacity:0;transform:translateY(12px) scale(.8)}to{opacity:1;transform:translateY(0) scale(1)}}
 .splash-progress{width:200px;height:3px;background:rgba(255,255,255,.1);border-radius:2px;margin-top:28px;overflow:hidden}
 .splash-progress-bar{height:100%;background:linear-gradient(90deg,#e94560,#f5a623);animation:splashLoad 4s ease-in-out forwards}
 @keyframes splashLoad{0%{width:0}100%{width:100%}}
@@ -258,7 +267,7 @@ input::placeholder{color:#888}
   const blob=new Blob([JSON.stringify(m)],{type:'application/manifest+json'});
   document.getElementById('pwa-manifest').href=URL.createObjectURL(blob);
 })();
-if('serviceWorker' in navigator){const sw=`const C='dekal-v1.1.5';self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',()=>clients.claim());`;navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});}
+if('serviceWorker' in navigator){const sw=`const C='dekal-v1.1.8';self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',()=>clients.claim());`;navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});}
 </script>
 </head>
 <body>
@@ -266,9 +275,25 @@ if('serviceWorker' in navigator){const sw=`const C='dekal-v1.1.5';self.addEventL
 <!-- SPLASH -->
 <div id="splash-screen">
   <div class="splash-title">DÉKAL</div>
-  <div class="splash-sub">v1.1.5</div>
+  <div class="splash-cards" id="splash-cards"></div>
+  <div class="splash-sub">v1.1.8</div>
   <div class="splash-tagline">crédits : claude.ai · @Pneubis</div>
   <div class="splash-progress"><div class="splash-progress-bar"></div></div>
+  <script>
+  (function(){
+    const colors={1:'#1a6b3a',2:'#1a6b3a',3:'#1a6b3a',4:'#1a4a8a',5:'#1a4a8a',6:'#1a4a8a',7:'#7d3c98',8:'#7d3c98',9:'#7d3c98',10:'#922b21'};
+    const cards=document.getElementById('splash-cards');
+    const vals=Array.from({length:5},()=>Math.floor(Math.random()*10)+1);
+    vals.forEach((v,i)=>{
+      const d=document.createElement('div');
+      d.className='splash-card';
+      d.style.background=colors[v];
+      d.style.animationDelay=(i*0.08)+'s';
+      d.textContent=v;
+      cards.appendChild(d);
+    });
+  })();
+  </script>
 </div>
 
 <!-- OVERLAYS -->
@@ -292,7 +317,7 @@ if('serviceWorker' in navigator){const sw=`const C='dekal-v1.1.5';self.addEventL
 <!-- SCREEN: MENU -->
 <div class="screen active" id="screen-menu">
   <h1>DÉKAL</h1>
-  <p style="font-size:.85em;color:rgba(255,255,255,.65);letter-spacing:3px;margin:-4px 0 10px;font-weight:600">v1.1.5</p>
+  <p style="font-size:.85em;color:rgba(255,255,255,.65);letter-spacing:3px;margin:-4px 0 10px;font-weight:600">v1.1.8</p>
   <p class="subtitle" style="margin-top:0">
     <button onclick="UI.showRules()" style="background:none;border:1px solid rgba(255,255,255,.25);color:#aaa;font-size:.8em;font-weight:600;padding:3px 12px;border-radius:20px;cursor:pointer;min-height:auto">ⓘ Règles</button>
   </p>
@@ -410,7 +435,7 @@ if('serviceWorker' in navigator){const sw=`const C='dekal-v1.1.5';self.addEventL
 <script>
 "use strict";
 // ============================================================
-// DÉKAL MULTIJOUEUR v1.1.5
+// DÉKAL MULTIJOUEUR v1.1.8
 //
 // RÈGLES EXACTES :
 // - 100 cartes Dékal numérotées
@@ -599,7 +624,7 @@ const ActionLog = (() => {
 // ── NETWORK (PeerJS — identique Skyjo) ──
 const Network = (() => {
   const PEER_SERVER_HOST='dekal-yha3.onrender.com', PEER_SERVER_PATH='/peerjs';
-  const PEER_SERVER_HOST_FB='0.peerjs.com', PEER_SERVER_PATH_FB='/';
+  const PEER_SERVER_PORT=443, PEER_SERVER_SECURE=true;
   const ICE={ iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'},{urls:'stun:stun.cloudflare.com:3478'},{urls:'turn:openrelay.metered.ca:80',username:'openrelayproject',credential:'openrelayproject'},{urls:'turn:openrelay.metered.ca:443',username:'openrelayproject',credential:'openrelayproject'},{urls:'turns:openrelay.metered.ca:443',username:'openrelayproject',credential:'openrelayproject'}],iceCandidatePoolSize:10 };
   let pendingRequests={};
 
@@ -608,19 +633,27 @@ const Network = (() => {
     function tryServer(host,port,path,secure,onOk,onFail){
       let settled=false;
       UI.startConnProgress(12000,90);
-      function ok(pid){if(settled)return;settled=true;clearTimeout(timer);myPeerId=pid;onOk(pid);}
+      function ok(pid){if(settled)return;settled=true;clearTimeout(timer);myPeerId=pid;UI.finishConnProgress();onOk(pid);}
       function fail(err){if(settled)return;settled=true;clearTimeout(timer);try{if(peer){peer.destroy();peer=null;}}catch(e){}onFail(err);}
       const timer=setTimeout(()=>fail(new Error('timeout')),12000);
-      try{const opts={host,port,path,secure,config:ICE,debug:1};peer=id?new Peer(id,opts):new Peer(opts);}catch(e){fail(new Error(e.message));return;}
-      peer.on('open',pid=>{UI.finishConnProgress();UI.setConnStatus('connecting','📡 Connecté');ok(pid);});
-      peer.on('error',err=>{if(err.type==='unavailable-id')fail(new Error('HOST_MIGRATED'));else fail(new Error(err.type||'peer-error'));});
+      try{
+        const opts={host,port,path,secure,config:ICE,debug:0};
+        peer=id?new Peer(id,opts):new Peer(opts);
+      }catch(e){fail(new Error(e.message));return;}
+      peer.on('open',pid=>{UI.setConnStatus('connected','');ok(pid);});
+      peer.on('error',err=>{
+        if(err.type==='unavailable-id')fail(new Error('HOST_MIGRATED'));
+        else fail(new Error(err.type||'peer-error'));
+      });
       peer.on('disconnected',()=>{if(peer&&!settled)peer.reconnect();});
     }
     return new Promise((resolve,reject)=>{
-      tryServer(PEER_SERVER_HOST,443,PEER_SERVER_PATH,true,resolve,err1=>{
+      tryServer(PEER_SERVER_HOST,PEER_SERVER_PORT,PEER_SERVER_PATH,PEER_SERVER_SECURE,resolve,err1=>{
         if(err1&&err1.message==='HOST_MIGRATED'){reject(err1);return;}
         UI.setConnStatus('connecting','📡 Serveur alternatif...');
-        tryServer(PEER_SERVER_HOST_FB,443,PEER_SERVER_PATH_FB,true,resolve,err2=>{reject(err2&&err2.message==='HOST_MIGRATED'?err2:new Error('Serveur inaccessible'));});
+        tryServer('0.peerjs.com',443,'/',true,resolve,err2=>{
+          reject(err2&&err2.message==='HOST_MIGRATED'?err2:new Error('Serveur inaccessible'));
+        });
       });
     });
   }
