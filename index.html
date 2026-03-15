@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Dékal">
 <link rel="manifest" id="pwa-manifest">
-<title>Dékal Multijoueur v1.2.5</title>
+<title>Dékal Multijoueur v1.2.6</title>
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/davidshimjs-qrcodejs@0.0.2/qrcode.min.js"></script>
 <style>
@@ -265,7 +265,7 @@ input::placeholder{color:#888}
   const blob=new Blob([JSON.stringify(m)],{type:'application/manifest+json'});
   document.getElementById('pwa-manifest').href=URL.createObjectURL(blob);
 })();
-if('serviceWorker' in navigator){const sw=`const C='dekal-v1.2.5';self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',()=>clients.claim());`;navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});}
+if('serviceWorker' in navigator){const sw=`const C='dekal-v1.2.6';self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',()=>clients.claim());`;navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});}
 </script>
 </head>
 <body>
@@ -274,7 +274,7 @@ if('serviceWorker' in navigator){const sw=`const C='dekal-v1.2.5';self.addEventL
 <div id="splash-screen">
   <div class="splash-title">DÉKAL</div>
   <div class="splash-cards" id="splash-cards"></div>
-  <div class="splash-sub">v1.2.5</div>
+  <div class="splash-sub">v1.2.6</div>
   <div class="splash-tagline">crédits : claude.ai · @Pneubis</div>
   <div class="splash-progress"><div class="splash-progress-bar"></div></div>
   <script>
@@ -315,7 +315,7 @@ if('serviceWorker' in navigator){const sw=`const C='dekal-v1.2.5';self.addEventL
 <!-- SCREEN: MENU -->
 <div class="screen active" id="screen-menu">
   <h1>DÉKAL</h1>
-  <p style="font-size:.85em;color:rgba(255,255,255,.65);letter-spacing:3px;margin:-4px 0 10px;font-weight:600">v1.2.5</p>
+  <p style="font-size:.85em;color:rgba(255,255,255,.65);letter-spacing:3px;margin:-4px 0 10px;font-weight:600">v1.2.6</p>
   <p class="subtitle" style="margin-top:0">
     <button onclick="UI.showRules()" style="background:none;border:1px solid rgba(255,255,255,.25);color:#aaa;font-size:.8em;font-weight:600;padding:3px 12px;border-radius:20px;cursor:pointer;min-height:auto">ⓘ Règles</button>
     <button onclick="UI.showScoreOptions()" id="score-target-btn" style="background:none;border:1px solid rgba(245,166,35,.4);color:rgba(245,166,35,.8);font-size:.8em;font-weight:600;padding:3px 12px;border-radius:20px;cursor:pointer;min-height:auto;margin-left:8px">🎯 Score max : 50</button>
@@ -435,7 +435,7 @@ if('serviceWorker' in navigator){const sw=`const C='dekal-v1.2.5';self.addEventL
 <script>
 "use strict";
 // ============================================================
-// DÉKAL MULTIJOUEUR v1.2.5
+// DÉKAL MULTIJOUEUR v1.2.6
 //
 // RÈGLES EXACTES :
 // - 100 cartes Dékal numérotées
@@ -1312,16 +1312,19 @@ const Render = (() => {
       statusEl.textContent = iAmPushing ? '➡️ Insérez le ' + gameState.pendingCard.v + ' dans votre grille' : pusherName + ' insère sa carte…';
     }
 
-    // Centre : affiche uniquement les cartes non encore réclamées quand c'est mon tour de choisir
+    // Centre : cartes révélées avec pseudo en dessous
     const showCenter = (sub === 'dekal_picks' || sub === 'others_push') && gameState.centerCards?.length > 0;
     centerArea.style.display = showCenter ? '' : 'none';
     if (showCenter) {
       const canPickCenter = (sub === 'dekal_picks' && iAmDekal) || iAmInPushQueue;
       let ch = `<div class="center-title">🃏 Choisissez une carte</div><div class="center-cards-row">`;
       gameState.centerCards.forEach((cc, i) => {
-        ch += `<div class="card ${cvClass(cc.v)}${canPickCenter ? ' center-choice' : ''}"
-          onclick="${canPickCenter ? 'performAction({type:\'pick_center\',centerIdx:' + i + '})' : ''}">
-          ${cc.v}
+        ch += `<div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+          <div class="card ${cvClass(cc.v)}${canPickCenter ? ' center-choice' : ''}"
+            onclick="${canPickCenter ? 'performAction({type:\'pick_center\',centerIdx:' + i + '})' : ''}">
+            ${cc.v}
+          </div>
+          <span style="font-size:.62em;color:#aaa;white-space:nowrap">${getPlayerName(cc.playerId)}</span>
         </div>`;
       });
       ch += '</div>';
@@ -1347,37 +1350,34 @@ const Render = (() => {
       const isDekalHolder = p.id === dekalPlayer?.id;
       const isPushing = iAmPushing && isMe;
       const discoTag = p.disconnected ? '<span class="reconnecting-badge">⚠️</span>' : '';
-
-      // Score visible avec annulations simulées
       const visScore = calcVisibleScore(p.id);
+
+      // Carte révélée de ce joueur (dans centerCards)
+      const inCenter = gameState.centerCards?.find(cc => cc.playerId === p.id);
+      const isPickable = inCenter && ((sub === 'dekal_picks' && isMe && iAmDekal) || (sub === 'others_push' && isMe && iAmInPushQueue));
 
       html += `<div class="player-zone pcolor-${colorIdx} ${isDekalHolder ? 'dekal-turn' : ''} ${isMe ? 'is-me' : ''}">
         <div class="player-header">
           <span class="player-name-label">${p.name}${isMe?'<span style="font-size:.75em;color:#aaa"> (vous)</span>':''}${isDekalHolder?'<span class="dekal-pion"> 🏅</span>':''} ${discoTag}</span>
           <span class="player-score-label">Visible : ${visScore} pts</span>
         </div>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:5px">`;
+        <div style="display:flex;flex-direction:row;align-items:flex-start;gap:8px">`;
 
       if (isPushing) {
         html += buildPushUI(p.id, gameState.pendingCard.v);
       } else {
         html += buildGrid(p.id, isMe, sub, myChosen, isMe && sub === 'choose' && !myChosen);
-        // Carte choisie par ce joueur : affichée sous sa grille
-        const playerChosen = gameState.chosen?.[p.id];
-        if (playerChosen && sub !== 'choose') {
-          const isPickable = (sub === 'dekal_picks' && isMe && iAmDekal) || (sub === 'others_push' && isMe && iAmInPushQueue);
-          // Trouver la carte dans centerCards
-          const inCenter = gameState.centerCards?.find(cc => cc.playerId === p.id);
-          if (inCenter) {
-            const centerIdx = gameState.centerCards.indexOf(inCenter);
-            html += `<div style="display:flex;align-items:center;gap:6px;font-size:.7em;color:#aaa">
-              <span>Révèle :</span>
-              <div class="card ${cvClass(inCenter.v)}${isPickable?' center-choice':''}"
-                onclick="${isPickable?`performAction({type:'pick_center',centerIdx:${centerIdx}})`:''}">
-                ${inCenter.v}
-              </div>
-            </div>`;
-          }
+
+        // Carte révélée à DROITE de la grille
+        if (inCenter) {
+          const centerIdx = gameState.centerCards.indexOf(inCenter);
+          html += `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:4px">
+            <div class="card ${cvClass(inCenter.v)}${isPickable?' center-choice':''}"
+              onclick="${isPickable?`performAction({type:'pick_center',centerIdx:${centerIdx}})`:''}">
+              ${inCenter.v}
+            </div>
+            <span style="font-size:.6em;color:#aaa">révèle</span>
+          </div>`;
         }
       }
 
