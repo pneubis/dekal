@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Dékal">
 <link rel="manifest" id="pwa-manifest">
-<title>Dékal Multijoueur v1.0.3</title>
+<title>Dékal Multijoueur v1.0.5</title>
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/davidshimjs-qrcodejs@0.0.2/qrcode.min.js"></script>
 <style>
@@ -68,17 +68,20 @@ input::placeholder{color:#888}
 .grid-row{display:flex;gap:4px}
 
 /* push arrows around grid */
-.push-ui{display:grid;gap:4px}
-.push-ui .push-row{display:flex;gap:4px;align-items:center;justify-content:center}
 .push-btn{
-  width:28px;height:52px;border-radius:6px;border:none;background:rgba(46,204,113,.15);
-  border:1.5px solid rgba(46,204,113,.35);color:#2ecc71;font-size:1em;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;min-height:auto;padding:0;
-  transition:all .2s;flex-shrink:0;
+  border-radius:6px;
+  background:rgba(46,204,113,.18);
+  border:1.5px solid rgba(46,204,113,.4);
+  color:#2ecc71;font-size:1.15em;font-weight:700;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  min-height:auto;padding:0;line-height:1;
+  transition:all .15s;flex-shrink:0;
 }
-.push-btn:hover{background:rgba(46,204,113,.3);border-color:#2ecc71;transform:none;box-shadow:0 0 8px rgba(46,204,113,.4)}
-.push-btn.col-btn{width:52px;height:28px}
+.push-btn:hover{background:rgba(46,204,113,.38);border-color:#2ecc71;transform:scale(1.1);box-shadow:0 0 10px rgba(46,204,113,.4)}
+.push-btn:active{transform:scale(.93)}
 .push-btn:disabled{opacity:.2;cursor:not-allowed}
+
 
 /* ── PLAYER ZONES ── */
 .player-zone{background:rgba(255,255,255,.05);border-radius:12px;padding:10px;border:2px solid transparent;transition:border-color .2s,background .2s}
@@ -233,8 +236,9 @@ input::placeholder{color:#888}
 .lb-name{flex:1;font-size:.82em;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lb-wins{font-size:.75em;color:#f5a623;font-weight:700;width:32px;text-align:right}
 .lb-games{font-size:.72em;color:#888;width:28px;text-align:right}
-#log-bar{font-size:.72em;color:rgba(255,255,255,.5)}
-.log-entry{text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#log-bar{font-size:.7em;color:rgba(255,255,255,.55);padding:4px 12px 6px}
+.log-entry{text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:1px 0;line-height:1.4}
+.log-entry:last-child{color:rgba(255,255,255,.85);font-weight:600}
 .reconnecting-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(231,76,60,.15);border:1px solid rgba(231,76,60,.4);border-radius:8px;padding:2px 8px;font-size:.68em;color:#e74c3c;animation:reconnectBlink 1.2s ease-in-out infinite}
 @keyframes reconnectBlink{0%,100%{opacity:1}50%{opacity:.4}}
 .score-option-group{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:8px}
@@ -253,7 +257,7 @@ input::placeholder{color:#888}
   const blob=new Blob([JSON.stringify(m)],{type:'application/manifest+json'});
   document.getElementById('pwa-manifest').href=URL.createObjectURL(blob);
 })();
-if('serviceWorker' in navigator){const sw=`const C='dekal-v1.0.3';self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',()=>clients.claim());`;navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});}
+if('serviceWorker' in navigator){const sw=`const C='dekal-v1.0.5';self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',()=>clients.claim());`;navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});}
 </script>
 </head>
 <body>
@@ -261,7 +265,7 @@ if('serviceWorker' in navigator){const sw=`const C='dekal-v1.0.3';self.addEventL
 <!-- SPLASH -->
 <div id="splash-screen">
   <div class="splash-title">DÉKAL</div>
-  <div class="splash-sub">v1.0.3</div>
+  <div class="splash-sub">v1.0.5</div>
   <div class="splash-tagline">crédits : claude.ai · @Pneubis</div>
   <div class="splash-progress"><div class="splash-progress-bar"></div></div>
 </div>
@@ -287,7 +291,7 @@ if('serviceWorker' in navigator){const sw=`const C='dekal-v1.0.3';self.addEventL
 <!-- SCREEN: MENU -->
 <div class="screen active" id="screen-menu">
   <h1>DÉKAL</h1>
-  <p style="font-size:.85em;color:rgba(255,255,255,.65);letter-spacing:3px;margin:-4px 0 10px;font-weight:600">v1.0.3</p>
+  <p style="font-size:.85em;color:rgba(255,255,255,.65);letter-spacing:3px;margin:-4px 0 10px;font-weight:600">v1.0.5</p>
   <p class="subtitle" style="margin-top:0">
     <button onclick="UI.showRules()" style="background:none;border:1px solid rgba(255,255,255,.25);color:#aaa;font-size:.8em;font-weight:600;padding:3px 12px;border-radius:20px;cursor:pointer;min-height:auto">ⓘ Règles</button>
   </p>
@@ -404,7 +408,7 @@ if('serviceWorker' in navigator){const sw=`const C='dekal-v1.0.3';self.addEventL
 <script>
 "use strict";
 // ============================================================
-// DÉKAL MULTIJOUEUR v1.0.3
+// DÉKAL MULTIJOUEUR v1.0.5
 //
 // RÈGLES EXACTES :
 // - 100 cartes Dékal numérotées
@@ -426,7 +430,7 @@ const GRID = 4;           // 4×4
 const TOTAL_TURNS = 16;   // 16 tours par partie
 const MAX_PLAYERS = 6;
 const RECONNECT_TIMEOUT_MS = 15000;
-const MAX_LOG_ENTRIES = 2;
+const MAX_LOG_ENTRIES = 5;
 const HOST_MIGRATION_DELAY_MS = 1500;
 
 // 100 cartes Dékal : on génère des valeurs 1-15 (distribution approximative)
@@ -788,7 +792,7 @@ function handlePlayerAction(playerId, action) {
       if (!cell || cell.revealed) return; // doit être face cachée
       gameState.chosen[playerId] = { row, col, v: cell.v };
       gameState.chosenCount = (gameState.chosenCount || 0) + 1;
-      Network.broadcastLog('🃏 ' + getPlayerName(playerId) + ' choisit sa carte');
+      Network.broadcastLog('🤫 ' + getPlayerName(playerId) + ' choisit une carte (ligne ' + (row+1) + ', col ' + (col+1) + ')');
       // Vérifier si tout le monde a choisi
       const allChosen = gameState.players.every(p => !!gameState.chosen[p.id]);
       if (allChosen) {
@@ -806,7 +810,11 @@ function handlePlayerAction(playerId, action) {
         });
         gameState.subPhase = 'dekal_picks';
         Network.broadcastToast('🏅 ' + getPlayerName(gameState.players[gameState.dekalIdx].id) + ' choisit une carte !');
-        Network.broadcastLog('👀 Révélation ! ' + gameState.centerCards.map(c => c.v).join(', '));
+        // Log détaillé : chaque joueur + sa carte révélée
+        const revealLines = gameState.centerCards.map(c =>
+          getPlayerName(c.playerId) + ' → ' + c.v
+        ).join(' · ');
+        Network.broadcastLog('👀 Révélation : ' + revealLines);
       }
       Network.broadcastState();
       setTimeout(() => Bot.maybePlay(), 100);
@@ -829,7 +837,7 @@ function handlePlayerAction(playerId, action) {
       gameState.centerCards.splice(centerIdx, 1);
       gameState.pendingCard = { playerId, v: pickedCard.v }; // carte à insérer
       gameState.subPhase = 'push_mine';
-      Network.broadcastLog('✋ ' + getPlayerName(playerId) + ' prend le ' + pickedCard.v);
+      Network.broadcastLog('✋ ' + getPlayerName(playerId) + ' prend le ' + pickedCard.v + ' (de ' + getPlayerName(pickedCard.playerId) + ')');
       Network.broadcastState();
       setTimeout(() => Bot.maybePlay(), 100);
       break;
@@ -863,18 +871,16 @@ function handlePlayerAction(playerId, action) {
         grid[GRID - 1][idx] = { v, revealed: true };
       }
 
-      // Handle null slots (where chosen card was removed) — move nulls along too, they just disappear
-      // Clean up: if any null cell resulted from the push, it means the empty slot was pushed out
-      // Actually the null slot is filled by the push, the null "falls off" harmlessly
-      // Remove any remaining null in that row/col (should be at most 1)
-      if (dir === 'row_right' || dir === 'row_left') {
-        for (let c = 0; c < GRID; c++) if (grid[idx][c] === null) { grid[idx][c] = { v: 0, revealed: false }; /* shouldn't happen */ }
-      } else {
-        for (let r = 0; r < GRID; r++) if (grid[r][idx] === null) { grid[r][idx] = { v: 0, revealed: false }; }
-      }
+      // Nettoyer tous les null résiduels dans toute la grille
+      // (le slot vide du joueur peut rester si la ligne/col poussée est différente de celle d'où vient la carte)
+      for (let r = 0; r < GRID; r++)
+        for (let c = 0; c < GRID; c++)
+          if (grid[r][c] === null) grid[r][c] = { v: 0, revealed: false };
 
       gameState.pendingCard = null;
-      Network.broadcastLog('➡️ ' + getPlayerName(playerId) + ' insère ' + v + (ejected ? ' (éjecte ' + (ejected.v || '?') + ')' : ''));
+      const dirLabel = { row_right:'→ ligne '+(idx+1), row_left:'← ligne '+(idx+1), col_down:'↓ col '+(idx+1), col_up:'↑ col '+(idx+1) }[dir] || dir;
+      const ejectLabel = ejected ? ' · éjecte ' + (ejected.v !== undefined ? ejected.v : '?') : '';
+      Network.broadcastLog('➡️ ' + getPlayerName(playerId) + ' insère ' + v + ' (' + dirLabel + ejectLabel + ')');
       Sound.play('push');
 
       // Advance to next player in queue or end turn
@@ -949,6 +955,7 @@ function endGame() {
   // Annuler les cartes adjacentes de même valeur
   gameState.players.forEach(p => {
     const g = gameState.grids[p.id];
+    let totalAnnulled = 0;
     let changed = true;
     while (changed) {
       changed = false;
@@ -965,12 +972,16 @@ function endGame() {
       }
       if (toAnnul.size) {
         changed = true;
+        totalAnnulled += toAnnul.size;
         toAnnul.forEach(k => { const [r,c] = k.split(',').map(Number); g[r][c] = { v: 0, revealed: true, annulled: true }; });
         // Remove annulled
         for (let r = 0; r < GRID; r++)
           for (let c = 0; c < GRID; c++)
             if (g[r][c] && g[r][c].annulled) g[r][c] = null;
       }
+    }
+    if (totalAnnulled > 0) {
+      ActionLog.add('✨ ' + p.name + ' : ' + totalAnnulled + ' carte' + (totalAnnulled > 1 ? 's' : '') + ' annulée' + (totalAnnulled > 1 ? 's' : ''));
     }
   });
 
@@ -1292,12 +1303,12 @@ const Render = (() => {
       for (let c = 0; c < GRID; c++) {
         const cell = grid[r][c];
         if (!cell) {
-          // Empty slot (chosen card removed)
-          h += '<div class="card" style="background:rgba(255,255,255,.04);border:2px dashed rgba(255,255,255,.1);opacity:.5"></div>';
+          // Slot vide : carte partie au centre ce tour
+          h += '<div class="card" style="background:rgba(255,255,255,.04);border:2px dashed rgba(255,255,255,.2);opacity:.6;font-size:.6em;color:rgba(255,255,255,.3)">✦</div>';
         } else if (!cell.revealed) {
           const sel = isMe && myChosen && myChosen.row === r && myChosen.col === c;
           const clickable = canSelect && isMe;
-          h += `<div class="card face-down${sel?' selected':''}${clickable?' selectable':''}" onclick="${clickable?'performAction({type:\'choose_card\',row:'+r+',col:'+c+'})':''}"></div>`;
+          h += `<div class="card face-down${sel?' selected':''}${clickable?' selectable':''}" onclick="${clickable?`performAction({type:'choose_card',row:${r},col:${c}})`:''}"></div>`;
         } else {
           h += `<div class="card ${cvClass(cell.v)}">${cell.v}</div>`;
         }
@@ -1309,46 +1320,64 @@ const Render = (() => {
   }
 
   function buildPushUI(pid, cardV) {
-    // Build the grid with push arrows on all 4 sides
     const grid = gameState.grids[pid];
-    // Top arrows (col_down)
-    let h = '<div style="display:inline-flex;flex-direction:column;align-items:center;gap:2px">';
-    // Top row arrows
-    h += '<div style="display:flex;gap:4px;margin-left:32px">';
-    for (let c = 0; c < GRID; c++) h += `<button class="push-btn col-btn" onclick="performAction({type:'push_card',dir:'col_down',idx:${c}})" title="Insérer en haut col ${c}">↓</button>`;
+    // Taille carte + gap : 52px carte, 4px gap entre cartes
+    const cellSize = 52, gap = 4;
+    const gridPx = GRID * cellSize + (GRID - 1) * gap; // = 220px
+    const arrowW = 28, arrowH = cellSize; // flèche latérale : même hauteur que carte
+    const arrowColH = 28, arrowColW = cellSize; // flèche colonne : même largeur que carte
+
+    let h = `<div style="display:inline-flex;flex-direction:column;align-items:center;gap:${gap}px">`;
+
+    // ── Flèches du haut (col_down) ──
+    h += `<div style="display:flex;gap:${gap}px;margin-left:${arrowW + gap}px">`;
+    for (let c = 0; c < GRID; c++)
+      h += `<button class="push-btn col-btn" style="width:${arrowColW}px;height:${arrowColH}px" onclick="performAction({type:'push_card',dir:'col_down',idx:${c}})" title="Insérer col ${c+1} par le haut">↓</button>`;
     h += '</div>';
 
-    // Middle: left arrows | grid | right arrows
-    h += '<div style="display:flex;gap:2px;align-items:center">';
-    // Left arrows (row_right)
-    h += '<div style="display:flex;flex-direction:column;gap:4px">';
-    for (let r = 0; r < GRID; r++) h += `<button class="push-btn" onclick="performAction({type:'push_card',dir:'row_right',idx:${r}})" title="Insérer à gauche ligne ${r}">→</button>`;
+    // ── Rangée centrale : flèches gauche | grille | flèches droite ──
+    h += `<div style="display:flex;gap:${gap}px;align-items:flex-start">`;
+
+    // Flèches gauche (row_right = insérer à gauche, pousse vers droite)
+    h += `<div style="display:flex;flex-direction:column;gap:${gap}px">`;
+    for (let r = 0; r < GRID; r++)
+      h += `<button class="push-btn" style="width:${arrowW}px;height:${arrowH}px" onclick="performAction({type:'push_card',dir:'row_right',idx:${r}})" title="Insérer ligne ${r+1} par la gauche">→</button>`;
     h += '</div>';
-    // Grid
+
+    // Grille
     h += '<div class="grid-wrap">';
     for (let r = 0; r < GRID; r++) {
       h += '<div class="grid-row">';
       for (let c = 0; c < GRID; c++) {
         const cell = grid[r][c];
-        if (!cell) h += '<div class="card" style="background:rgba(255,255,255,.04);border:2px dashed rgba(255,255,255,.15)"></div>';
+        if (!cell) h += `<div class="card" style="background:rgba(255,255,255,.04);border:2px dashed rgba(255,255,255,.2);font-size:.6em;color:rgba(255,255,255,.3)">✦</div>`;
         else if (!cell.revealed) h += '<div class="card face-down"></div>';
         else h += `<div class="card ${cvClass(cell.v)}">${cell.v}</div>`;
       }
       h += '</div>';
     }
     h += '</div>';
-    // Right arrows (row_left)
-    h += '<div style="display:flex;flex-direction:column;gap:4px">';
-    for (let r = 0; r < GRID; r++) h += `<button class="push-btn" onclick="performAction({type:'push_card',dir:'row_left',idx:${r}})" title="Insérer à droite ligne ${r}">←</button>`;
-    h += '</div></div>';
 
-    // Bottom arrows (col_up)
-    h += '<div style="display:flex;gap:4px;margin-left:32px">';
-    for (let c = 0; c < GRID; c++) h += `<button class="push-btn col-btn" onclick="performAction({type:'push_card',dir:'col_up',idx:${c}})" title="Insérer en bas col ${c}">↑</button>`;
+    // Flèches droite (row_left = insérer à droite, pousse vers gauche)
+    h += `<div style="display:flex;flex-direction:column;gap:${gap}px">`;
+    for (let r = 0; r < GRID; r++)
+      h += `<button class="push-btn" style="width:${arrowW}px;height:${arrowH}px" onclick="performAction({type:'push_card',dir:'row_left',idx:${r}})" title="Insérer ligne ${r+1} par la droite">←</button>`;
     h += '</div>';
 
-    // Card to insert
-    h += `<div style="margin-top:8px;display:flex;align-items:center;gap:8px;font-size:.8em;color:#aaa"><span>Carte à insérer :</span><div class="card ${cvClass(cardV)}" style="width:40px;height:40px;font-size:1.1em;pointer-events:none">${cardV}</div></div>`;
+    h += '</div>'; // fin rangée centrale
+
+    // ── Flèches du bas (col_up) ──
+    h += `<div style="display:flex;gap:${gap}px;margin-left:${arrowW + gap}px">`;
+    for (let c = 0; c < GRID; c++)
+      h += `<button class="push-btn col-btn" style="width:${arrowColW}px;height:${arrowColH}px" onclick="performAction({type:'push_card',dir:'col_up',idx:${c}})" title="Insérer col ${c+1} par le bas">↑</button>`;
+    h += '</div>';
+
+    // Carte à insérer
+    h += `<div style="margin-top:6px;display:flex;align-items:center;gap:10px;font-size:.8em;color:#aaa">
+      <span>Insérer :</span>
+      <div class="card ${cvClass(cardV)}" style="pointer-events:none;box-shadow:0 0 12px rgba(245,166,35,.5);border-color:#f5a623">${cardV}</div>
+    </div>`;
+
     h += '</div>';
     return h;
   }
